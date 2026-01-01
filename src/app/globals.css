@@ -1,0 +1,25 @@
+/* src/app/globals.css */
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(0.64 0.18 32);
+  --color-primary-foreground: oklch(0.3 0.15 32);
+  --color-background: oklch(1 0 0);
+  --color-foreground: oklch(0.15 0.02 32);
+}
+
+@layer base {
+  * {
+    @apply border-gray-200;
+  }
+  
+  body {
+    @apply bg-white text-gray-900 antialiased;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
