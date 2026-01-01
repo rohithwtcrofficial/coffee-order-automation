@@ -32,7 +32,7 @@ This system is **internal (admin-only)** and designed to be secure, scalable, an
 
 ## 📂 Project Structure
 
-```
+```text
 coffee-admin/
 ├── src/
 │   ├── app/
@@ -60,7 +60,7 @@ coffee-admin/
 
 ## 🔁 Order Email Automation Flow
 
-```
+```text
 Admin updates order status
 → Firestore update
 → Cloud Function trigger
@@ -143,7 +143,7 @@ firebase deploy --only functions
 1. Create admin user via Firebase Authentication
 2. Add admin document in Firestore:
 
-```
+```text
 admins/{auth.uid}
 ```
 
@@ -178,4 +178,3 @@ This project is **private/internal** and intended for business operations.
 ## ✨ Final Note
 
 This system follows **real-world e-commerce best practices** and is designed for **long-term scalability and trust**.
-
