@@ -1,17 +1,17 @@
-// src/app/(dashboard)/products/new/page.tsx
+// src/app/(dashboard)/products/[id]/edit/page.tsx
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
-import { ArrowLeft, Plus, X, Upload, Image as ImageIcon } from 'lucide-react';
+import { ArrowLeft, Plus, X, Upload } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase/client';
 
 const categoryOptions = [
@@ -33,9 +33,13 @@ interface Variant {
   price: number;
 }
 
-export default function NewProductPage() {
+export default function EditProductPage() {
   const router = useRouter();
+  const params = useParams();
+  const productId = params.id as string;
+
   const [loading, setLoading] = useState(false);
+  const [fetchLoading, setFetchLoading] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   // Product Information
@@ -48,8 +52,10 @@ export default function NewProductPage() {
   const [isActive, setIsActive] = useState(true);
 
   // Image handling
+  const [currentImageUrl, setCurrentImageUrl] = useState<string>('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [imageChanged, setImageChanged] = useState(false);
 
   // Variants (grams and prices)
   const [variants, setVariants] = useState<Variant[]>([
@@ -59,6 +65,49 @@ export default function NewProductPage() {
   // Tasting Notes
   const [tastingNotes, setTastingNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
+
+  // Fetch product data
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const productDoc = await getDoc(doc(db, 'products', productId));
+        
+        if (!productDoc.exists()) {
+          toast.error('Product not found');
+          router.push('/products');
+          return;
+        }
+
+        const data = productDoc.data();
+        
+        setName(data.name || '');
+        setCategory(data.category || 'Single Origin');
+        setRoastLevel(data.roastLevel || 'MEDIUM');
+        setDescription(data.description || '');
+        setOrigin(data.origin || '');
+        setStockQuantity(data.stockQuantity || 0);
+        setIsActive(data.isActive ?? true);
+        setCurrentImageUrl(data.imageUrl || '');
+        setTastingNotes(data.tastingNotes || []);
+
+        // Convert pricePerVariant to variants array
+        if (data.availableGrams && data.pricePerVariant) {
+          const variantsArray = data.availableGrams.map((grams: number) => ({
+            grams,
+            price: data.pricePerVariant[grams] || 0,
+          }));
+          setVariants(variantsArray);
+        }
+      } catch (error) {
+        console.error('Error fetching product:', error);
+        toast.error('Failed to load product');
+      } finally {
+        setFetchLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [productId, router]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -76,6 +125,7 @@ export default function NewProductPage() {
       }
 
       setImageFile(file);
+      setImageChanged(true);
       
       // Create preview
       const reader = new FileReader();
@@ -89,6 +139,8 @@ export default function NewProductPage() {
   const removeImage = () => {
     setImageFile(null);
     setImagePreview('');
+    setImageChanged(true);
+    setCurrentImageUrl('');
   };
 
   const uploadImage = async (): Promise<string | null> => {
@@ -164,10 +216,29 @@ export default function NewProductPage() {
         throw new Error('Duplicate gram sizes are not allowed');
       }
 
-      // Upload image if provided
-      let imageUrl: string | null = null;
-      if (imageFile) {
-        imageUrl = await uploadImage();
+      let imageUrl = currentImageUrl;
+
+      // Handle image updates
+      if (imageChanged) {
+        // Delete old image if exists
+        if (currentImageUrl) {
+          try {
+            const oldImageRef = ref(storage, currentImageUrl);
+            await deleteObject(oldImageRef);
+          } catch (error) {
+            console.error('Error deleting old image:', error);
+          }
+        }
+
+        // Upload new image if provided
+        if (imageFile) {
+          const newImageUrl = await uploadImage();
+          if (newImageUrl) {
+            imageUrl = newImageUrl;
+          }
+        } else {
+          imageUrl = '';
+        }
       }
 
       // Build price per variant object
@@ -179,8 +250,8 @@ export default function NewProductPage() {
         availableGrams.push(v.grams);
       });
 
-      // Create product
-      await addDoc(collection(db, 'products'), {
+      // Update product
+      await updateDoc(doc(db, 'products', productId), {
         name,
         category,
         roastLevel,
@@ -191,20 +262,30 @@ export default function NewProductPage() {
         stockQuantity,
         isActive,
         tastingNotes: tastingNotes.length > 0 ? tastingNotes : null,
-        imageUrl: imageUrl || null, // Store image URL
-        currency: 'INR', // Store currency
-        createdAt: serverTimestamp(),
+        imageUrl: imageUrl || null,
+        currency: 'INR',
         updatedAt: serverTimestamp(),
       });
 
-      toast.success('Product created successfully!');
+      toast.success('Product updated successfully!');
       router.push('/products');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create product');
+      toast.error(error.message || 'Failed to update product');
     } finally {
       setLoading(false);
     }
   };
+
+  if (fetchLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-24">
@@ -217,8 +298,8 @@ export default function NewProductPage() {
       </Link>
 
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
-        <p className="text-gray-600 mt-1">Create a new coffee product in your catalog</p>
+        <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
+        <p className="text-gray-600 mt-1">Update product information</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -226,7 +307,7 @@ export default function NewProductPage() {
         <Card>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Image</h2>
           
-          {!imagePreview ? (
+          {!imagePreview && !currentImageUrl ? (
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
               <input
                 type="file"
@@ -250,8 +331,9 @@ export default function NewProductPage() {
             </div>
           ) : (
             <div className="relative">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={imagePreview}
+                src={imagePreview || currentImageUrl}
                 alt="Product preview"
                 className="w-full h-64 object-cover rounded-lg"
               />
@@ -264,10 +346,11 @@ export default function NewProductPage() {
               >
                 <X className="w-4 h-4 text-red-600" />
               </Button>
-              <div className="mt-2 flex items-center text-sm text-gray-600">
-                <ImageIcon className="w-4 h-4 mr-1" />
-                {imageFile?.name}
-              </div>
+              {imagePreview && (
+                <div className="mt-2 flex items-center text-sm text-gray-600">
+                  <span className="font-medium">New image selected: {imageFile?.name}</span>
+                </div>
+              )}
             </div>
           )}
         </Card>
@@ -436,24 +519,22 @@ export default function NewProductPage() {
         </Card>
 
         {/* Submit Buttons - FIXED: Now visible */}
-        <div className="flex gap-4 sticky bottom-0 bg-white p-4 rounded-lg border-2 border-primary-200 shadow-lg">
-          <Button
+        <div className="flex gap-4 sticky bottom-0 bg-white p-4 rounded-lg border-2 border-primary-200 shadow-lg z-10">
+          <button
             type="button"
-            variant="outline"
             onClick={() => router.push('/products')}
             disabled={loading || uploadingImage}
-            className="w-32"
+            className="w-32 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            loading={loading || uploadingImage}
+          </button>
+          <button
+            type="submit"
             disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
-            className="flex-1"
+            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {uploadingImage ? 'Uploading Image...' : loading ? 'Creating Product...' : 'Create Product'}
-          </Button>
+            {uploadingImage ? 'Uploading Image...' : loading ? 'Updating Product...' : 'Update Product'}
+          </button>
         </div>
       </form>
     </div>

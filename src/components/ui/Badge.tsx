@@ -1,8 +1,7 @@
 // src/components/ui/Badge.tsx
-import { HTMLAttributes, ReactNode } from 'react';
+import { HTMLAttributes } from 'react';
 
 interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  children: ReactNode;
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
 }
 
@@ -21,12 +20,8 @@ export function Badge({
   };
 
   return (
-    <span 
-      className={`
-        inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-        ${variants[variant]}
-        ${className}
-      `}
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${variants[variant]} ${className}`}
       {...props}
     >
       {children}
