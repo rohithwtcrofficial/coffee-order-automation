@@ -1,0 +1,710 @@
+[debug] [2026-01-03T10:21:24.989Z] ----------------------------------------------------------------------
+[debug] [2026-01-03T10:21:24.991Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Admin\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start --only functions
+[debug] [2026-01-03T10:21:24.992Z] CLI Version:   15.1.0
+[debug] [2026-01-03T10:21:24.992Z] Platform:      win32
+[debug] [2026-01-03T10:21:24.992Z] Node Version:  v22.18.0
+[debug] [2026-01-03T10:21:24.992Z] Time:          Sat Jan 03 2026 15:51:24 GMT+0530 (India Standard Time)
+[debug] [2026-01-03T10:21:24.992Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-01-03T10:21:26.685Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-01-03T10:21:26.685Z] > authorizing via signed-in user (hr@westernterraincoffee.com)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[debug] [2026-01-03T10:21:26.698Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-03T10:21:26.698Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-01-03T10:21:26.704Z] Emulator locator file path: C:\Users\Admin\AppData\Local\Temp\hub-coffee-order-engine.json
+[debug] [2026-01-03T10:21:26.704Z] [hub] writing locator at C:\Users\Admin\AppData\Local\Temp\hub-coffee-order-engine.json
+[debug] [2026-01-03T10:21:26.726Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-03T10:21:26.726Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-03T10:21:26.726Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-01-03T10:21:26.726Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] !  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[debug] [2026-01-03T10:21:26.744Z] defaultcredentials: writing to file C:\Users\Admin\AppData\Roaming\firebase\hr_westernterraincoffee_com_application_default_credentials.json
+[debug] [2026-01-03T10:21:26.747Z] Setting GAC to C:\Users\Admin\AppData\Roaming\firebase\hr_westernterraincoffee_com_application_default_credentials.json {"metadata":{"emulator":{"name":"functions"},"message":"Setting GAC to C:\\Users\\Admin\\AppData\\Roaming\\firebase\\hr_westernterraincoffee_com_application_default_credentials.json"}}
+[debug] [2026-01-03T10:21:26.748Z] Checked if tokens are valid: true, expires at: 1767438542594
+[debug] [2026-01-03T10:21:26.748Z] Checked if tokens are valid: true, expires at: 1767438542594
+[debug] [2026-01-03T10:21:26.751Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/coffee-order-engine/adminSdkConfig [none]
+[debug] [2026-01-03T10:21:31.715Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/coffee-order-engine/adminSdkConfig 200
+[debug] [2026-01-03T10:21:31.715Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/coffee-order-engine/adminSdkConfig {"projectId":"coffee-order-engine","databaseURL":"https://coffee-order-engine-default-rtdb.firebaseio.com","storageBucket":"coffee-order-engine.firebasestorage.app"}
+[info] i  ui: downloading ui-v1.15.0.zip... {"metadata":{"emulator":{"name":"ui"},"message":"downloading ui-v1.15.0.zip..."}}
+[debug] [2026-01-03T10:21:31.745Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 
+[debug] [2026-01-03T10:21:31.805Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 200
+[debug] [2026-01-03T10:21:31.805Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip [stream]
+[debug] [2026-01-03T10:21:31.967Z] Data is 3538469
+[debug] [2026-01-03T10:21:31.967Z] [unzip] Entry: client/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-03T10:21:31.967Z] [unzip] Processing entry: client\
+[debug] [2026-01-03T10:21:31.967Z] [unzip] mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\
+[debug] [2026-01-03T10:21:31.969Z] [unzip] Entry: client/favicon-16x16.png (compressed_size=293 bytes, uncompressed_size=293 bytes)
+[debug] [2026-01-03T10:21:31.969Z] [unzip] Processing entry: client\favicon-16x16.png
+[debug] [2026-01-03T10:21:31.969Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.969Z] [unzip] Writing file: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\favicon-16x16.png
+[debug] [2026-01-03T10:21:31.970Z] [unzip] Entry: client/safari-pinned-tab.svg (compressed_size=1433 bytes, uncompressed_size=2611 bytes)
+[debug] [2026-01-03T10:21:31.970Z] [unzip] Processing entry: client\safari-pinned-tab.svg
+[debug] [2026-01-03T10:21:31.970Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.971Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\safari-pinned-tab.svg
+[debug] [2026-01-03T10:21:31.974Z] [unzip] Entry: client/favicon.ico (compressed_size=2933 bytes, uncompressed_size=13294 bytes)
+[debug] [2026-01-03T10:21:31.974Z] [unzip] Processing entry: client\favicon.ico
+[debug] [2026-01-03T10:21:31.975Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.975Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\favicon.ico
+[debug] [2026-01-03T10:21:31.977Z] [unzip] Entry: client/index.html (compressed_size=1364 bytes, uncompressed_size=3071 bytes)
+[debug] [2026-01-03T10:21:31.977Z] [unzip] Processing entry: client\index.html
+[debug] [2026-01-03T10:21:31.977Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.977Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\index.html
+[debug] [2026-01-03T10:21:31.980Z] [unzip] Entry: client/android-chrome-192x192.png (compressed_size=2684 bytes, uncompressed_size=2684 bytes)
+[debug] [2026-01-03T10:21:31.980Z] [unzip] Processing entry: client\android-chrome-192x192.png
+[debug] [2026-01-03T10:21:31.980Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.981Z] [unzip] Writing file: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\android-chrome-192x192.png
+[debug] [2026-01-03T10:21:31.982Z] [unzip] Entry: client/apple-touch-icon.png (compressed_size=2123 bytes, uncompressed_size=2152 bytes)
+[debug] [2026-01-03T10:21:31.982Z] [unzip] Processing entry: client\apple-touch-icon.png
+[debug] [2026-01-03T10:21:31.982Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.982Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\apple-touch-icon.png
+[debug] [2026-01-03T10:21:31.984Z] [unzip] Entry: client/android-chrome-512x512.png (compressed_size=5369 bytes, uncompressed_size=5411 bytes)
+[debug] [2026-01-03T10:21:31.984Z] [unzip] Processing entry: client\android-chrome-512x512.png
+[debug] [2026-01-03T10:21:31.984Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.984Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\android-chrome-512x512.png
+[debug] [2026-01-03T10:21:31.986Z] [unzip] Entry: client/manifest.json (compressed_size=245 bytes, uncompressed_size=551 bytes)
+[debug] [2026-01-03T10:21:31.986Z] [unzip] Processing entry: client\manifest.json
+[debug] [2026-01-03T10:21:31.986Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.986Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\manifest.json
+[debug] [2026-01-03T10:21:31.988Z] [unzip] Entry: client/robots.txt (compressed_size=26 bytes, uncompressed_size=26 bytes)
+[debug] [2026-01-03T10:21:31.989Z] [unzip] Processing entry: client\robots.txt
+[debug] [2026-01-03T10:21:31.989Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.989Z] [unzip] Writing file: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\robots.txt
+[debug] [2026-01-03T10:21:31.990Z] [unzip] Entry: client/mstile-150x150.png (compressed_size=2034 bytes, uncompressed_size=2034 bytes)
+[debug] [2026-01-03T10:21:31.990Z] [unzip] Processing entry: client\mstile-150x150.png
+[debug] [2026-01-03T10:21:31.990Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:31.990Z] [unzip] Writing file: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\mstile-150x150.png
+[debug] [2026-01-03T10:21:31.991Z] [unzip] Entry: client/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-03T10:21:31.991Z] [unzip] Processing entry: client\assets\
+[debug] [2026-01-03T10:21:31.991Z] [unzip] mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\
+[debug] [2026-01-03T10:21:31.992Z] [unzip] Entry: client/assets/index-BX-A56oj.js (compressed_size=582089 bytes, uncompressed_size=2092775 bytes)
+[debug] [2026-01-03T10:21:31.992Z] [unzip] Processing entry: client\assets\index-BX-A56oj.js
+[debug] [2026-01-03T10:21:31.992Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-01-03T10:21:31.992Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-BX-A56oj.js
+[debug] [2026-01-03T10:21:32.009Z] [unzip] Entry: client/assets/index-CjB9C900.css (compressed_size=35979 bytes, uncompressed_size=298654 bytes)
+[debug] [2026-01-03T10:21:32.009Z] [unzip] Processing entry: client\assets\index-CjB9C900.css
+[debug] [2026-01-03T10:21:32.009Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-01-03T10:21:32.010Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-CjB9C900.css
+[debug] [2026-01-03T10:21:32.013Z] [unzip] Entry: client/assets/index-BX-A56oj.js.map (compressed_size=2362482 bytes, uncompressed_size=10036679 bytes)
+[debug] [2026-01-03T10:21:32.013Z] [unzip] Processing entry: client\assets\index-BX-A56oj.js.map
+[debug] [2026-01-03T10:21:32.013Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets
+[debug] [2026-01-03T10:21:32.013Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\index-BX-A56oj.js.map
+[debug] [2026-01-03T10:21:32.092Z] [unzip] Entry: client/assets/extensions/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-03T10:21:32.093Z] [unzip] Processing entry: client\assets\extensions\
+[debug] [2026-01-03T10:21:32.093Z] [unzip] mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions\
+[debug] [2026-01-03T10:21:32.093Z] [unzip] Entry: client/assets/extensions/default-extension.png (compressed_size=1646 bytes, uncompressed_size=1657 bytes)
+[debug] [2026-01-03T10:21:32.093Z] [unzip] Processing entry: client\assets\extensions\default-extension.png
+[debug] [2026-01-03T10:21:32.093Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions
+[debug] [2026-01-03T10:21:32.094Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\extensions\default-extension.png
+[debug] [2026-01-03T10:21:32.095Z] [unzip] Entry: client/assets/img/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-03T10:21:32.095Z] [unzip] Processing entry: client\assets\img\
+[debug] [2026-01-03T10:21:32.095Z] [unzip] mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\img\
+[debug] [2026-01-03T10:21:32.096Z] [unzip] Entry: client/assets/img/database.png (compressed_size=29449 bytes, uncompressed_size=29988 bytes)
+[debug] [2026-01-03T10:21:32.096Z] [unzip] Processing entry: client\assets\img\database.png
+[debug] [2026-01-03T10:21:32.096Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\img
+[debug] [2026-01-03T10:21:32.096Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\img\database.png
+[debug] [2026-01-03T10:21:32.098Z] [unzip] Entry: client/assets/provider-icons/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-03T10:21:32.098Z] [unzip] Processing entry: client\assets\provider-icons\
+[debug] [2026-01-03T10:21:32.098Z] [unzip] mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\
+[debug] [2026-01-03T10:21:32.098Z] [unzip] Entry: client/assets/provider-icons/auth_service_saml.svg (compressed_size=575 bytes, uncompressed_size=1226 bytes)
+[debug] [2026-01-03T10:21:32.098Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_saml.svg
+[debug] [2026-01-03T10:21:32.098Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.099Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_saml.svg
+[debug] [2026-01-03T10:21:32.100Z] [unzip] Entry: client/assets/provider-icons/auth_service_phone.svg (compressed_size=261 bytes, uncompressed_size=414 bytes)
+[debug] [2026-01-03T10:21:32.100Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_phone.svg
+[debug] [2026-01-03T10:21:32.100Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.101Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_phone.svg
+[debug] [2026-01-03T10:21:32.102Z] [unzip] Entry: client/assets/provider-icons/auth_service_facebook.svg (compressed_size=289 bytes, uncompressed_size=457 bytes)
+[debug] [2026-01-03T10:21:32.102Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2026-01-03T10:21:32.102Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.102Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_facebook.svg
+[debug] [2026-01-03T10:21:32.105Z] [unzip] Entry: client/assets/provider-icons/auth_service_game_center.svg (compressed_size=991 bytes, uncompressed_size=3921 bytes)
+[debug] [2026-01-03T10:21:32.105Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2026-01-03T10:21:32.105Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.106Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_game_center.svg
+[debug] [2026-01-03T10:21:32.107Z] [unzip] Entry: client/assets/provider-icons/auth_service_apple.svg (compressed_size=230 bytes, uncompressed_size=334 bytes)
+[debug] [2026-01-03T10:21:32.107Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_apple.svg
+[debug] [2026-01-03T10:21:32.107Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.107Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_apple.svg
+[debug] [2026-01-03T10:21:32.109Z] [unzip] Entry: client/assets/provider-icons/auth_service_github.svg (compressed_size=466 bytes, uncompressed_size=838 bytes)
+[debug] [2026-01-03T10:21:32.109Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_github.svg
+[debug] [2026-01-03T10:21:32.109Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.109Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_github.svg
+[debug] [2026-01-03T10:21:32.110Z] [unzip] Entry: client/assets/provider-icons/auth_service_mslive.svg (compressed_size=203 bytes, uncompressed_size=378 bytes)
+[debug] [2026-01-03T10:21:32.110Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2026-01-03T10:21:32.110Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.111Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_mslive.svg
+[debug] [2026-01-03T10:21:32.112Z] [unzip] Entry: client/assets/provider-icons/auth_service_yahoo.svg (compressed_size=577 bytes, uncompressed_size=1182 bytes)
+[debug] [2026-01-03T10:21:32.112Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2026-01-03T10:21:32.112Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.112Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_yahoo.svg
+[debug] [2026-01-03T10:21:32.114Z] [unzip] Entry: client/assets/provider-icons/auth_service_twitter.svg (compressed_size=444 bytes, uncompressed_size=751 bytes)
+[debug] [2026-01-03T10:21:32.114Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2026-01-03T10:21:32.114Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.114Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_twitter.svg
+[debug] [2026-01-03T10:21:32.115Z] [unzip] Entry: client/assets/provider-icons/auth_service_play_games.svg (compressed_size=565 bytes, uncompressed_size=1173 bytes)
+[debug] [2026-01-03T10:21:32.115Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2026-01-03T10:21:32.115Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.116Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_play_games.svg
+[debug] [2026-01-03T10:21:32.117Z] [unzip] Entry: client/assets/provider-icons/auth_service_email.svg (compressed_size=228 bytes, uncompressed_size=326 bytes)
+[debug] [2026-01-03T10:21:32.117Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_email.svg
+[debug] [2026-01-03T10:21:32.117Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.118Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_email.svg
+[debug] [2026-01-03T10:21:32.119Z] [unzip] Entry: client/assets/provider-icons/auth_service_google.svg (compressed_size=409 bytes, uncompressed_size=720 bytes)
+[debug] [2026-01-03T10:21:32.119Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_google.svg
+[debug] [2026-01-03T10:21:32.119Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.119Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_google.svg
+[debug] [2026-01-03T10:21:32.121Z] [unzip] Entry: client/assets/provider-icons/auth_service_oidc.svg (compressed_size=414 bytes, uncompressed_size=858 bytes)
+[debug] [2026-01-03T10:21:32.121Z] [unzip] Processing entry: client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2026-01-03T10:21:32.121Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons
+[debug] [2026-01-03T10:21:32.121Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\assets\provider-icons\auth_service_oidc.svg
+[debug] [2026-01-03T10:21:32.122Z] [unzip] Entry: client/browserconfig.xml (compressed_size=491 bytes, uncompressed_size=822 bytes)
+[debug] [2026-01-03T10:21:32.123Z] [unzip] Processing entry: client\browserconfig.xml
+[debug] [2026-01-03T10:21:32.123Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:32.123Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\browserconfig.xml
+[debug] [2026-01-03T10:21:32.124Z] [unzip] Entry: client/favicon-32x32.png (compressed_size=475 bytes, uncompressed_size=475 bytes)
+[debug] [2026-01-03T10:21:32.124Z] [unzip] Processing entry: client\favicon-32x32.png
+[debug] [2026-01-03T10:21:32.124Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client
+[debug] [2026-01-03T10:21:32.125Z] [unzip] Writing file: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\client\favicon-32x32.png
+[debug] [2026-01-03T10:21:32.125Z] [unzip] Entry: server/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-01-03T10:21:32.125Z] [unzip] Processing entry: server\
+[debug] [2026-01-03T10:21:32.125Z] [unzip] mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\server\
+[debug] [2026-01-03T10:21:32.126Z] [unzip] Entry: server/server.mjs.map (compressed_size=217845 bytes, uncompressed_size=944978 bytes)
+[debug] [2026-01-03T10:21:32.126Z] [unzip] Processing entry: server\server.mjs.map
+[debug] [2026-01-03T10:21:32.126Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\server
+[debug] [2026-01-03T10:21:32.126Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\server\server.mjs.map
+[debug] [2026-01-03T10:21:32.134Z] [unzip] Entry: server/server.mjs (compressed_size=276407 bytes, uncompressed_size=933701 bytes)
+[debug] [2026-01-03T10:21:32.134Z] [unzip] Processing entry: server\server.mjs
+[debug] [2026-01-03T10:21:32.134Z] [unzip] else mkdir: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\server
+[debug] [2026-01-03T10:21:32.134Z] [unzip] deflating: C:\Users\Admin\.cache\firebase\emulators\ui-v1.15.0\server\server.mjs
+[info] i  functions: Watching "D:\Rohith S Moolya\Website\coffee-admin\functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\" for Cloud Functions..."}}
+[debug] [2026-01-03T10:21:32.170Z] Validating nodejs source
+[debug] [2026-01-03T10:21:33.206Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T10:21:33.206Z] Building nodejs source
+[debug] [2026-01-03T10:21:33.207Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T10:21:33.212Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T10:21:33.233Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8008
+
+[debug] [2026-01-03T10:21:33.921Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[info] i  functions[us-central1-onOrderCreated]: function ignored because the firestore emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the firestore emulator does not exist or is not running."}}
+[info] i  functions[us-central1-onOrderStatusChange]: function ignored because the firestore emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the firestore emulator does not exist or is not running."}}
+[debug] [2026-01-03T10:21:37.972Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 
+[debug] [2026-01-03T10:36:11.925Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\sender.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\sender.ts changed, reloading triggers"}}
+[debug] [2026-01-03T10:36:12.931Z] Validating nodejs source
+[debug] [2026-01-03T10:36:14.035Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T10:36:14.035Z] Building nodejs source
+[debug] [2026-01-03T10:36:14.036Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T10:36:14.037Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T10:36:14.048Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8277
+
+[debug] [2026-01-03T10:36:14.688Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T10:40:06.490Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\templates\orderConfirmation.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\templates\\orderConfirmation.ts changed, reloading triggers"}}
+[debug] [2026-01-03T10:40:07.490Z] Validating nodejs source
+[debug] [2026-01-03T10:40:08.676Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T10:40:08.676Z] Building nodejs source
+[debug] [2026-01-03T10:40:08.676Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T10:40:08.678Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T10:40:08.689Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8989
+
+[debug] [2026-01-03T10:40:09.401Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T10:40:18.643Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\templates\processing.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\templates\\processing.ts changed, reloading triggers"}}
+[debug] [2026-01-03T10:40:19.650Z] Validating nodejs source
+[debug] [2026-01-03T10:40:20.807Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T10:40:20.808Z] Building nodejs source
+[debug] [2026-01-03T10:40:20.808Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T10:40:20.809Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T10:40:20.824Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8560
+
+[debug] [2026-01-03T10:40:21.600Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T10:59:51.156Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\templates\cancelled.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\templates\\cancelled.ts changed, reloading triggers"}}
+[debug] [2026-01-03T10:59:52.166Z] Validating nodejs source
+[debug] [2026-01-03T10:59:53.301Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T10:59:53.302Z] Building nodejs source
+[debug] [2026-01-03T10:59:53.302Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T10:59:53.304Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T10:59:53.315Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8843
+
+[debug] [2026-01-03T10:59:54.132Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T11:01:10.340Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\templates\delivered.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\templates\\delivered.ts changed, reloading triggers"}}
+[debug] [2026-01-03T11:01:11.345Z] Validating nodejs source
+[debug] [2026-01-03T11:01:12.586Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T11:01:12.587Z] Building nodejs source
+[debug] [2026-01-03T11:01:12.587Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T11:01:12.589Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T11:01:12.599Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8212
+
+[debug] [2026-01-03T11:01:13.446Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T11:02:29.514Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\templates\delivered.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\templates\\delivered.ts changed, reloading triggers"}}
+[debug] [2026-01-03T11:02:30.522Z] Validating nodejs source
+[debug] [2026-01-03T11:02:31.776Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T11:02:31.777Z] Building nodejs source
+[debug] [2026-01-03T11:02:31.777Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T11:02:31.779Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T11:02:31.791Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8454
+
+[debug] [2026-01-03T11:02:32.601Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T11:03:32.790Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\templates\shipped.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\templates\\shipped.ts changed, reloading triggers"}}
+[debug] [2026-01-03T11:03:33.794Z] Validating nodejs source
+[debug] [2026-01-03T11:03:35.266Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T11:03:35.266Z] Building nodejs source
+[debug] [2026-01-03T11:03:35.266Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T11:03:35.269Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T11:03:35.279Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8775
+
+[debug] [2026-01-03T11:03:35.952Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T11:11:52.273Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\email\sender.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\email\\sender.ts changed, reloading triggers"}}
+[debug] [2026-01-03T11:11:53.282Z] Validating nodejs source
+[debug] [2026-01-03T11:11:54.523Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T11:11:54.523Z] Building nodejs source
+[debug] [2026-01-03T11:11:54.524Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T11:11:54.526Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T11:11:54.540Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8061
+
+[debug] [2026-01-03T11:11:55.341Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T11:18:01.037Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\index.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\index.ts changed, reloading triggers"}}
+[debug] [2026-01-03T11:18:02.049Z] Validating nodejs source
+[debug] [2026-01-03T11:18:03.172Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T11:18:03.172Z] Building nodejs source
+[debug] [2026-01-03T11:18:03.172Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T11:18:03.174Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T11:18:03.185Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8668
+
+[debug] [2026-01-03T11:18:03.873Z] Got response from /__/functions.yaml {"endpoints":{"onOrderCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderCreated"},"onOrderStatusChange":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.updated","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"orders/{orderId}"},"retry":false},"entryPoint":"onOrderStatusChange"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{},"params":[{"name":"EMAIL_USER","description":"Gmail address for sending emails","type":"string","default":""},{"name":"EMAIL_PASSWORD","description":"Gmail App Password (16 characters)","type":"string","default":""}]}
+[info] +  functions: Loaded functions definitions from source: onOrderCreated, onOrderStatusChange. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: onOrderCreated, onOrderStatusChange."}}
+[debug] [2026-01-03T11:22:10.223Z] File D:\Rohith S Moolya\Website\coffee-admin\functions\src\index.ts changed, reloading triggers {"metadata":{"emulator":{"name":"functions"},"message":"File D:\\Rohith S Moolya\\Website\\coffee-admin\\functions\\src\\index.ts changed, reloading triggers"}}
+[debug] [2026-01-03T11:22:11.229Z] Validating nodejs source
+[debug] [2026-01-03T11:22:12.367Z] > [functions] package.json contents: {
+  "name": "functions",
+  "scripts": {
+    "lint": "eslint .",
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "24"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "@types/node-fetch": "^2.6.13",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^7.0.12"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^7.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.12.0",
+    "@typescript-eslint/parser": "^5.12.0",
+    "eslint": "^8.9.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-import": "^2.25.4",
+    "firebase-functions-test": "^3.4.1",
+    "typescript": "^5.7.3"
+  },
+  "private": true
+}
+[debug] [2026-01-03T11:22:12.367Z] Building nodejs source
+[debug] [2026-01-03T11:22:12.368Z] Failed to find version of module node: reached end of search path D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules
+[warn] !  functions: Your requested "node" version "24" doesn't match your global version "22". Using node@22 from host. 
+[info] i  functions: Loaded environment variables from .env. 
+[debug] [2026-01-03T11:22:12.370Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-01-03T11:22:12.381Z] Found firebase-functions binary at 'D:\Rohith S Moolya\Website\coffee-admin\functions\node_modules\.bin\firebase-functions'
