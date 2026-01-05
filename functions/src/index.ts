@@ -1,77 +1,145 @@
-// functions/src/index.ts
+import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/firestore';
 import * as admin from 'firebase-admin';
+import { logger } from './utils/logger';
 import { sendEmail } from './email/sender';
+
 import { generateOrderConfirmationEmail } from './email/templates/orderConfirmation';
 import { generateProcessingEmail } from './email/templates/processing';
 import { generateShippedEmail } from './email/templates/shipped';
 import { generateDeliveredEmail } from './email/templates/delivered';
 import { generateCancelledEmail } from './email/templates/cancelled';
 
+/**
+ * 🔐 Global options (MANDATORY for secrets)
+ */
+setGlobalOptions({
+  region: 'us-central1',
+  secrets: ['EMAIL_USER', 'EMAIL_PASSWORD', 'EMAIL_FROM_NAME'],
+});
+
+/**
+ * Initialize Admin SDK
+ */
 admin.initializeApp();
 const db = admin.firestore();
 
 /**
- * Order Created → Confirmation email
+ * Types
+ */
+interface OrderData {
+  customerId: string;
+  orderNumber: string;
+  status: string;
+  trackingId?: string;
+  totalAmount: number;
+ items: Array<{
+  productName: string;
+  grams: number;
+  quantity: number;
+  pricePerUnit: number;
+  subtotal: number;
+  category?: string;
+  roastLevel?: string;
+  imageUrl?: string;
+}>;
+  lastEmailSentStatus?: string;
+}
+
+interface CustomerData {
+  name: string;
+  email: string;
+  address: any;
+}
+
+/**
+ * 🆕 Order Created → Confirmation Email
  */
 export const onOrderCreated = onDocumentCreated(
   'orders/{orderId}',
   async (event) => {
-    const orderData = event.data?.data();
-    if (!orderData) return;
+    const orderId = event.params.orderId;
+    const order = event.data?.data() as OrderData | undefined;
+    if (!order) return;
 
     try {
-      const customerDoc = await db
+      const customerSnap = await db
         .collection('customers')
-        .doc(orderData.customerId)
+        .doc(order.customerId)
         .get();
 
-      const customerData = customerDoc.data();
-      if (!customerData?.email) return;
+      const customer = customerSnap.data() as CustomerData | undefined;
+      if (!customer?.email) return;
 
       const template = generateOrderConfirmationEmail({
-        customerName: customerData.name,
-        orderNumber: orderData.orderNumber,
-        items: orderData.items,
-        totalAmount: orderData.totalAmount,
-        address: customerData.address,
+        customerName: customer.name,
+        orderNumber: order.orderNumber,
+        items: order.items,
+        totalAmount: order.totalAmount,
+        address: customer.address,
       });
 
-      await sendEmail(customerData.email, template.subject, template.html);
+      await sendEmail(customer.email, template.subject, template.html);
+
+      await db.collection('emailLogs').add({
+        orderId,
+        emailType: 'ORDER_CONFIRMATION',
+        recipientEmail: customer.email,
+        status: 'success',
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      logger.success(`Order ${orderId}: Confirmation email sent`);
     } catch (err) {
-      console.error('onOrderCreated error:', err);
+      logger.error(`Order ${orderId}: Confirmation failed`, err);
     }
   }
 );
 
 /**
- * Order Status Changed → Status email
+ * 🔄 Order Status Updated → Status Email
  */
 export const onOrderStatusChange = onDocumentUpdated(
   'orders/{orderId}',
   async (event) => {
-    const before = event.data?.before.data();
-    const after = event.data?.after.data();
-    if (!before || !after) return;
+    const orderId = event.params.orderId;
 
+    const beforeRaw = event.data?.before.data() as OrderData;
+    const afterRaw = event.data?.after.data() as OrderData;
+    if (!beforeRaw || !afterRaw) return;
+
+    // ✅ NORMALIZE STATUS (THIS FIXES EVERYTHING)
+    const before: OrderData = {
+      ...beforeRaw,
+      status: beforeRaw.status?.toUpperCase(),
+    };
+
+    const after: OrderData = {
+      ...afterRaw,
+      status: afterRaw.status?.toUpperCase(),
+    };
+
+    // ✅ Safe comparison
     if (before.status === after.status) return;
 
+    if (after.lastEmailSentStatus === after.status) return;
+
     try {
-      const customerDoc = await db
+      const customerSnap = await db
         .collection('customers')
         .doc(after.customerId)
         .get();
 
-      const customerData = customerDoc.data();
-      if (!customerData?.email) return;
+      const customer = customerSnap.data() as CustomerData | undefined;
+      if (!customer?.email) return;
 
-      const productNames = after.items.map((i: any) => i.productName);
-
+      const productNames = after.items.map(i => i.productName);
       let template;
+
       switch (after.status) {
         case 'PROCESSING':
           template = generateProcessingEmail({
-            customerName: customerData.name,
+            customerName: customer.name,
             orderNumber: after.orderNumber,
             productNames,
           });
@@ -79,16 +147,16 @@ export const onOrderStatusChange = onDocumentUpdated(
 
         case 'SHIPPED':
           template = generateShippedEmail({
-            customerName: customerData.name,
+            customerName: customer.name,
             orderNumber: after.orderNumber,
-            trackingId: after.trackingId,
+            trackingId: after.trackingId || 'Will be updated',
             productNames,
           });
           break;
 
         case 'DELIVERED':
           template = generateDeliveredEmail({
-            customerName: customerData.name,
+            customerName: customer.name,
             orderNumber: after.orderNumber,
             productNames,
           });
@@ -96,7 +164,7 @@ export const onOrderStatusChange = onDocumentUpdated(
 
         case 'CANCELLED':
           template = generateCancelledEmail({
-            customerName: customerData.name,
+            customerName: customer.name,
             orderNumber: after.orderNumber,
             totalAmount: after.totalAmount,
           });
@@ -106,9 +174,23 @@ export const onOrderStatusChange = onDocumentUpdated(
           return;
       }
 
-      await sendEmail(customerData.email, template.subject, template.html);
+      await sendEmail(customer.email, template.subject, template.html);
+
+      await db.collection('orders').doc(orderId).update({
+        lastEmailSentStatus: after.status,
+      });
+
+      await db.collection('emailLogs').add({
+        orderId,
+        emailType: `STATUS_${after.status}`,
+        recipientEmail: customer.email,
+        status: 'success',
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      logger.success(`Order ${orderId}: ${after.status} email sent`);
     } catch (err) {
-      console.error('onOrderStatusChange error:', err);
+      logger.error(`Order ${orderId}: Status email failed`, err);
     }
   }
 );

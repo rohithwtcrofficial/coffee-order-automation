@@ -46,7 +46,7 @@ export function generateProcessingEmail(
           </div>
           
           <div class="footer">
-            <p>© 2024 Coffee Brands. All rights reserved.</p>
+            <p>© 2026 Western Terrain Coffee Roasters. All rights reserved.</p>
           </div>
         </div>
       </body>
