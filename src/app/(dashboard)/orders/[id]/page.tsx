@@ -8,7 +8,43 @@ import { adminDb } from '@/lib/firebase/admin';
 import { Order, Customer, BadgeVariant } from '@/lib/types/order';
 import { StatusUpdateSection } from '@/components/orders/StatusUpdateSection';
 
-async function getOrderWithCustomer(orderId: string): Promise<{ order: Order; customer: Customer } | null> {
+// Helper function to recursively convert Firestore Timestamps to ISO strings
+function serializeFirestoreData(data: any): any {
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  // Check if it's a Firestore Timestamp
+  if (data && typeof data === 'object' && '_seconds' in data && '_nanoseconds' in data) {
+    return new Date(data._seconds * 1000).toISOString();
+  }
+
+  // Check if it has a toDate method (Firestore Timestamp)
+  if (data && typeof data.toDate === 'function') {
+    return data.toDate().toISOString();
+  }
+
+  // Handle arrays
+  if (Array.isArray(data)) {
+    return data.map(item => serializeFirestoreData(item));
+  }
+
+  // Handle objects
+  if (typeof data === 'object') {
+    const serialized: any = {};
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        serialized[key] = serializeFirestoreData(data[key]);
+      }
+    }
+    return serialized;
+  }
+
+  // Return primitive values as-is
+  return data;
+}
+
+async function getOrderWithCustomer(orderId: string): Promise<{ order: Order; customer: Customer; deliveryAddress: Address } | null> {
   try {
     const orderDoc = await adminDb.collection('orders').doc(orderId).get();
 
@@ -23,18 +59,28 @@ async function getOrderWithCustomer(orderId: string): Promise<{ order: Order; cu
       return null;
     }
 
+    const customerData = customerDoc.data();
+    
+    // Find the delivery address used for this order
+    const deliveryAddress = customerData?.addresses?.find(
+      (addr: Address) => addr.id === orderData?.deliveryAddressId
+    );
+
+    if (!deliveryAddress) {
+      console.error('Delivery address not found');
+      return null;
+    }
+
     return {
-      order: {
+      order: serializeFirestoreData({
         id: orderDoc.id,
         ...orderData,
-        createdAt: orderData?.createdAt?.toDate() || new Date(),
-        updatedAt: orderData?.updatedAt?.toDate() || new Date(),
-      } as Order,
-      customer: {
+      }) as Order,
+      customer: serializeFirestoreData({
         id: customerDoc.id,
-        ...customerDoc.data(),
-        createdAt: customerDoc.data()?.createdAt?.toDate() || new Date(),
-      } as Customer,
+        ...customerData,
+      }) as Customer,
+      deliveryAddress: serializeFirestoreData(deliveryAddress) as Address,
     };
   } catch (error) {
     console.error('Error fetching order:', error);
@@ -54,7 +100,7 @@ export default async function OrderDetailPage({
     notFound();
   }
 
-  const { order, customer } = data;
+  const { order, customer, deliveryAddress } = data;
 
   const getStatusColor = (status: string): BadgeVariant => {
     switch (status) {
@@ -78,14 +124,15 @@ export default async function OrderDetailPage({
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
     return new Intl.DateTimeFormat('en-IN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    }).format(date);
+    }).format(dateObj);
   };
 
   const statusTimeline = [
@@ -106,7 +153,7 @@ export default async function OrderDetailPage({
       </Link>
 
       {/* Header with Status */}
-      <div className="bg-gradient-to-br from-indigo-50 via-blue-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-8 shadow-lg">
+      <div className="bg-linear-to-br from-indigo-50 via-blue-50 to-purple-50 border-2 border-indigo-200 rounded-2xl p-8 shadow-lg">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-3">
@@ -157,7 +204,7 @@ export default async function OrderDetailPage({
               {/* Progress Bar Background */}
               <div className="absolute top-6 left-0 right-0 h-2 bg-gray-300 rounded-full">
                 <div 
-                  className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-700 ease-out shadow-md"
+                  className="h-full bg-linear-to-r from-indigo-500 to-purple-500 rounded-full transition-all duration-700 ease-out shadow-md"
                   style={{ 
                     width: `${(statusTimeline.filter(s => s.active).length / statusTimeline.length) * 100}%` 
                   }}
@@ -170,7 +217,7 @@ export default async function OrderDetailPage({
                   <div key={step.status} className="flex flex-col items-center">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all duration-500 shadow-lg ${
                       step.active 
-                        ? 'bg-gradient-to-br from-indigo-500 to-purple-500 text-white scale-110' 
+                        ? 'bg-linear-to-br from-indigo-500 to-purple-500 text-white scale-110' 
                         : 'bg-white text-gray-400 border-2 border-gray-300'
                     }`}>
                       {step.active ? '✓' : idx + 1}
@@ -193,7 +240,7 @@ export default async function OrderDetailPage({
         <div className="lg:col-span-2 space-y-6">
           <Card className="shadow-xl border-2 border-gray-200">
             <div className="flex items-center gap-3 mb-6 pb-4 border-b-2 border-gray-100">
-              <div className="p-2.5 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-xl shadow-md">
+              <div className="p-2.5 bg-linear-to-br from-blue-500 to-indigo-500 rounded-xl shadow-md">
                 <Package className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900">Order Items</h2>
@@ -203,7 +250,7 @@ export default async function OrderDetailPage({
               {order.items.map((item, index) => (
                 <div
                   key={index}
-                  className="group relative bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-5 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
+                  className="group relative bg-linear-to-r from-gray-50 to-blue-50 rounded-2xl p-5 border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all duration-300"
                 >
                   <div className="flex items-center gap-5">
                     {item.imageUrl ? (
@@ -227,7 +274,7 @@ export default async function OrderDetailPage({
                         {item.category} • {item.roastLevel} Roast
                       </p>
                       <div className="flex items-center gap-3 flex-wrap">
-                        <span className="px-3 py-1.5 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold text-sm shadow-md">
+                        <span className="px-3 py-1.5 bg-linear-to-r from-blue-500 to-indigo-500 text-white rounded-lg font-bold text-sm shadow-md">
                           {item.grams}g
                         </span>
                         <span className="px-3 py-1.5 bg-white text-gray-700 rounded-lg font-semibold text-sm shadow-sm border border-gray-200">
@@ -240,7 +287,7 @@ export default async function OrderDetailPage({
                     </div>
                     
                     <div className="text-right">
-                      <p className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      <p className="text-3xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                         ₹{item.subtotal.toFixed(2)}
                       </p>
                     </div>
@@ -249,10 +296,10 @@ export default async function OrderDetailPage({
               ))}
             </div>
 
-            <div className="mt-6 pt-6 border-t-2 border-gray-200 bg-gradient-to-r from-indigo-50 to-purple-50 -mx-6 -mb-6 px-6 pb-6 rounded-b-2xl">
+            <div className="mt-6 pt-6 border-t-2 border-gray-200 bg-linear-to-r from-indigo-50 to-purple-50 -mx-6 -mb-6 px-6 pb-6 rounded-b-2xl">
               <div className="flex items-center justify-between">
                 <span className="text-xl font-bold text-gray-700">Total Amount</span>
-                <span className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-4xl font-bold bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   ₹{order.totalAmount.toFixed(2)}
                 </span>
               </div>
@@ -261,7 +308,7 @@ export default async function OrderDetailPage({
 
           {/* Tracking Information */}
           {order.trackingId && order.status === 'SHIPPED' && (
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-100 border-2 border-blue-300 shadow-xl">
+            <Card className="bg-linear-to-br from-blue-50 to-indigo-100 border-2 border-blue-300 shadow-xl">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-white rounded-xl shadow-md">
                   <Truck className="w-7 h-7 text-blue-600" />
@@ -284,7 +331,7 @@ export default async function OrderDetailPage({
           {/* Customer Information */}
           <Card className="shadow-xl border-2 border-gray-200">
             <div className="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
-              <div className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl shadow-md">
+              <div className="p-2.5 bg-linear-to-br from-green-500 to-emerald-500 rounded-xl shadow-md">
                 <User className="w-6 h-6 text-white" />
               </div>
               <h2 className="text-xl font-bold text-gray-900">Customer</h2>
@@ -311,24 +358,56 @@ export default async function OrderDetailPage({
           </Card>
 
           {/* Delivery Address */}
-          <Card className="shadow-xl border-2 border-gray-200">
-            <div className="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
-              <div className="p-2.5 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl shadow-md">
-                <MapPin className="w-6 h-6 text-white" />
-              </div>
-              <h2 className="text-xl font-bold text-gray-900">Delivery Address</h2>
-            </div>
+      <Card className="shadow-xl border-2 border-gray-200">
+        <div className="flex items-center gap-3 mb-5 pb-4 border-b-2 border-gray-100">
+          <div className="p-2.5 bg-linear-to-br from-orange-500 to-red-500 rounded-xl shadow-md">
+            <MapPin className="w-6 h-6 text-white" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900">Delivery Address</h2>
+          {deliveryAddress.label && (
+            <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-semibold">
+              {deliveryAddress.label}
+            </span>
+          )}
+          {deliveryAddress.isDefault && (
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">
+              Default
+            </span>
+          )}
+        </div>
 
-            <div className="text-gray-700 leading-relaxed space-y-1">
-              <p className="font-semibold text-gray-900">{customer.address.street}</p>
-              <p>{customer.address.city}, {customer.address.state}</p>
-              <p className="font-medium">{customer.address.postalCode}</p>
-              <p className="font-semibold text-gray-900 mt-2 pt-2 border-t border-gray-200">{customer.address.country}</p>
+        <div className="text-gray-700 leading-relaxed space-y-1">
+          <p className="font-semibold text-gray-900">{deliveryAddress.street}</p>
+          <p>{deliveryAddress.city}, {deliveryAddress.state}</p>
+          <p className="font-medium">{deliveryAddress.postalCode}</p>
+          <p className="font-semibold text-gray-900 mt-2 pt-2 border-t border-gray-200">
+            {deliveryAddress.country}
+          </p>
+        </div>
+
+        {/* Show all customer addresses */}
+        {customer.addresses && customer.addresses.length > 1 && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm font-semibold text-gray-600 mb-2">
+              Other Addresses ({customer.addresses.length - 1})
+            </p>
+            <div className="space-y-2">
+              {customer.addresses
+                .filter((addr) => addr.id !== deliveryAddress.id)
+                .slice(0, 2)
+                .map((addr) => (
+                  <div key={addr.id} className="text-xs text-gray-600 p-2 bg-gray-50 rounded">
+                    {addr.label && <span className="font-semibold">{addr.label}: </span>}
+                    {addr.street}, {addr.city}
+                  </div>
+                ))}
             </div>
-          </Card>
+          </div>
+        )}
+      </Card>
 
           {/* Order Summary */}
-          <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-300 shadow-xl">
+          <Card className="bg-linear-to-br from-purple-50 to-pink-50 border-2 border-purple-300 shadow-xl">
             <div className="flex items-center gap-3 mb-5 pb-4 border-b-2 border-purple-200">
               <div className="p-2.5 bg-white rounded-xl shadow-md">
                 <CreditCard className="w-6 h-6 text-purple-600" />

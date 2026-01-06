@@ -43,15 +43,16 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     }
   };
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    }).format(date);
-  };
+  const formatDate = (date: Date | string) => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return new Intl.DateTimeFormat('en-IN', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(dateObj);
+};
 
   // Filter orders
   const filteredOrders = orders.filter(order => {
@@ -92,6 +93,52 @@ export function OrdersTable({ orders }: OrdersTableProps) {
 
   return (
     <div className="space-y-6">
+
+      {/* Summary Stats */}
+      {filteredOrders.length > 0 && (
+  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+      <div className="flex items-center gap-2 text-blue-600 mb-1">
+        <Package className="w-4 h-4" />
+        <span className="text-sm font-medium">Total Orders</span>
+      </div>
+      <div className="text-2xl font-bold text-blue-900">{filteredOrders.length}</div>
+    </div>
+    
+    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+      <div className="flex items-center gap-2 text-green-600 mb-1">
+        <DollarSign className="w-4 h-4" />
+        <span className="text-sm font-medium">Total Revenue</span>
+      </div>
+      <div className="text-2xl font-bold text-green-900">
+        ₹{filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0).toFixed(2)}
+      </div>
+    </div>
+    
+    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+      <div className="flex items-center gap-2 text-purple-600 mb-1">
+        <Package className="w-4 h-4" />
+        <span className="text-sm font-medium">Total Items</span>
+      </div>
+      <div className="text-2xl font-bold text-purple-900">
+        {filteredOrders.reduce((sum, o) => 
+          sum + o.items.reduce((s, i) => s + i.quantity, 0), 0
+        )}
+      </div>
+    </div>
+    
+    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
+      <div className="flex items-center gap-2 text-orange-600 mb-1">
+        <DollarSign className="w-4 h-4" />
+        <span className="text-sm font-medium">Avg Order Value</span>
+      </div>
+      <div className="text-2xl font-bold text-orange-900">
+        ₹{(filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0) / filteredOrders.length).toFixed(2)}
+      </div>
+    </div>
+  </div>
+)}
+
       {/* Filters and Search */}
       <div className="space-y-4">
         {/* Search Bar */}
@@ -212,51 +259,6 @@ export function OrdersTable({ orders }: OrdersTableProps) {
           ))
         )}
       </div>
-
-      {/* Summary Stats */}
-      {filteredOrders.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-          <div className="bg-linear-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-            <div className="flex items-center gap-2 text-blue-600 mb-1">
-              <Package className="w-4 h-4" />
-              <span className="text-sm font-medium">Total Orders</span>
-            </div>
-            <div className="text-2xl font-bold text-blue-900">{filteredOrders.length}</div>
-          </div>
-          
-          <div className="bg-linear-to-br from-green-50 to-green-100 p-4 rounded-lg">
-            <div className="flex items-center gap-2 text-green-600 mb-1">
-              <DollarSign className="w-4 h-4" />
-              <span className="text-sm font-medium">Total Revenue</span>
-            </div>
-            <div className="text-2xl font-bold text-green-900">
-              ₹{filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0).toFixed(2)}
-            </div>
-          </div>
-          
-          <div className="bg-linear-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-            <div className="flex items-center gap-2 text-purple-600 mb-1">
-              <Package className="w-4 h-4" />
-              <span className="text-sm font-medium">Total Items</span>
-            </div>
-            <div className="text-2xl font-bold text-purple-900">
-              {filteredOrders.reduce((sum, o) => 
-                sum + o.items.reduce((s, i) => s + i.quantity, 0), 0
-              )}
-            </div>
-          </div>
-          
-          <div className="bg-linear-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
-            <div className="flex items-center gap-2 text-orange-600 mb-1">
-              <DollarSign className="w-4 h-4" />
-              <span className="text-sm font-medium">Avg Order Value</span>
-            </div>
-            <div className="text-2xl font-bold text-orange-900">
-              ₹{(filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0) / filteredOrders.length).toFixed(2)}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

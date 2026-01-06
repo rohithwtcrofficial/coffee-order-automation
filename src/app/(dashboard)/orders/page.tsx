@@ -4,7 +4,43 @@ import { OrdersTable } from '@/components/orders/OrdersTable';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { adminDb } from '@/lib/firebase/admin';
-import { Order } from '@/lib/types';
+import { Order } from '@/lib/types/order';
+
+// Helper function to recursively convert Firestore Timestamps to ISO strings
+function serializeFirestoreData(data: any): any {
+  if (data === null || data === undefined) {
+    return data;
+  }
+
+  // Check if it's a Firestore Timestamp
+  if (data && typeof data === 'object' && '_seconds' in data && '_nanoseconds' in data) {
+    return new Date(data._seconds * 1000).toISOString();
+  }
+
+  // Check if it has a toDate method (Firestore Timestamp)
+  if (data && typeof data.toDate === 'function') {
+    return data.toDate().toISOString();
+  }
+
+  // Handle arrays
+  if (Array.isArray(data)) {
+    return data.map(item => serializeFirestoreData(item));
+  }
+
+  // Handle objects
+  if (typeof data === 'object') {
+    const serialized: any = {};
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        serialized[key] = serializeFirestoreData(data[key]);
+      }
+    }
+    return serialized;
+  }
+
+  // Return primitive values as-is
+  return data;
+}
 
 async function getOrders(): Promise<Order[]> {
   try {
@@ -14,12 +50,14 @@ async function getOrders(): Promise<Order[]> {
       .limit(50)
       .get();
 
-    return ordersSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate() || new Date(),
-      updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-    })) as Order[];
+    return ordersSnapshot.docs.map((doc) => {
+      const data = doc.data();
+      // Recursively serialize all Firestore data
+      return serializeFirestoreData({
+        id: doc.id,
+        ...data,
+      });
+    }) as Order[];
   } catch (error) {
     console.error('Error fetching orders:', error);
     return [];

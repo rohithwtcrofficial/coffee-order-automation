@@ -1,10 +1,14 @@
-// src/lib/types.ts
+// src/lib/types/order.ts
 export interface Address {
+  id: string; // Add unique ID for each address
   street: string;
   city: string;
   state: string;
   postalCode: string;
   country: string;
+  isDefault: boolean; // Mark primary/default address
+  label?: string; // Optional label like "Home", "Office", etc.
+  createdAt: Date | string;
 }
 
 export interface Customer {
@@ -12,10 +16,11 @@ export interface Customer {
   name: string;
   email: string;
   phone: string;
-  address: Address;
+  addresses: Address[]; // Changed from single address to array
   totalOrders: number;
   totalSpent: number;
-  createdAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface OrderItem {
@@ -27,20 +32,21 @@ export interface OrderItem {
   quantity: number;
   pricePerUnit: number;
   subtotal: number;
-  imageUrl?: string; // Added this field
+  imageUrl?: string;
 }
 
 export interface Order {
   id: string;
   orderNumber: string;
   customerId: string;
+  deliveryAddressId: string; // Reference to which address was used
   items: OrderItem[];
   totalAmount: number;
   currency: string;
   status: 'PLACED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   trackingId?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export interface Product {
@@ -53,8 +59,8 @@ export interface Product {
   pricePerVariant: Record<number, number>;
   imageUrl?: string;
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: Date | string;
+  updatedAt: Date | string;
 }
 
 export type OrderStatus = Order['status'];
