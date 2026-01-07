@@ -15,11 +15,12 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage
 import { db, storage } from '@/lib/firebase/client';
 
 const categoryOptions = [
-  { value: 'Single Origin', label: 'Single Origin' },
-  { value: 'Blend', label: 'Blend' },
-  { value: 'Decaf', label: 'Decaf' },
-  { value: 'Special Edition', label: 'Special Edition' },
+  { value: 'COFFEE_BEANS', label: 'Coffee Beans' },
+  { value: 'FILTER_COFFEE', label: 'Filter Coffee' },
+  { value: 'INSTANT_COFFEE', label: 'Instant Coffee' },
+  { value: 'TEA', label: 'Tea' },
 ];
+
 
 const roastLevelOptions = [
   { value: 'LIGHT', label: 'Light' },
@@ -44,7 +45,7 @@ export default function EditProductPage() {
 
   // Product Information
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('Single Origin');
+  const [category, setCategory] = useState('COFFEE_BEANS');
   const [roastLevel, setRoastLevel] = useState('MEDIUM');
   const [description, setDescription] = useState('');
   const [origin, setOrigin] = useState('');
@@ -81,7 +82,7 @@ export default function EditProductPage() {
         const data = productDoc.data();
         
         setName(data.name || '');
-        setCategory(data.category || 'Single Origin');
+        setCategory(data.category || 'Coffee Beans');
         setRoastLevel(data.roastLevel || 'MEDIUM');
         setDescription(data.description || '');
         setOrigin(data.origin || '');
@@ -303,57 +304,79 @@ export default function EditProductPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Product Image */}
-        <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Image</h2>
-          
-          {!imagePreview && !currentImageUrl ? (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
-              <input
-                type="file"
-                id="product-image"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="product-image"
-                className="cursor-pointer flex flex-col items-center"
-              >
-                <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                <p className="text-sm font-medium text-gray-700 mb-1">
-                  Click to upload product image
-                </p>
-                <p className="text-xs text-gray-500">
-                  PNG, JPG, WEBP up to 5MB
-                </p>
-              </label>
-            </div>
-          ) : (
-            <div className="relative">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={imagePreview || currentImageUrl}
-                alt="Product preview"
-                className="w-full h-64 object-cover rounded-lg"
-              />
-              <Button
-                type="button"
-                onClick={removeImage}
-                variant="ghost"
-                size="sm"
-                className="absolute top-2 right-2 bg-white shadow-md hover:bg-red-50"
-              >
-                <X className="w-4 h-4 text-red-600" />
-              </Button>
-              {imagePreview && (
-                <div className="mt-2 flex items-center text-sm text-gray-600">
-                  <span className="font-medium">New image selected: {imageFile?.name}</span>
-                </div>
-              )}
-            </div>
-          )}
-        </Card>
+       {/* Product Image */}
+<Card>
+  <h2 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+    Product Image
+  </h2>
+
+  {!imagePreview && !currentImageUrl ? (
+    <div className="flex justify-center">
+      <div className="
+        w-280px
+        aspect-4/5
+        border-2 border-dashed border-gray-300
+        rounded-lg p-6
+        text-center
+        hover:border-primary-400 transition-colors
+        flex flex-col justify-center
+      ">
+        <input
+          type="file"
+          id="product-image"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="hidden"
+        />
+        <label
+          htmlFor="product-image"
+          className="cursor-pointer flex flex-col items-center"
+        >
+          <Upload className="w-10 h-10 text-gray-400 mb-3" />
+          <p className="text-sm font-medium text-gray-700 mb-1">
+            Upload product image
+          </p>
+          <p className="text-xs text-gray-500">
+            JPG, PNG, WEBP (561 × 700)
+          </p>
+        </label>
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col items-center">
+      <div className="relative w-280px aspect-4/5">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imagePreview || currentImageUrl}
+          alt="Product preview"
+          className="
+            w-full h-full
+            object-cover
+            rounded-lg
+            border border-gray-200
+          "
+        />
+
+        <Button
+          type="button"
+          onClick={removeImage}
+          variant="ghost"
+          size="sm"
+          className="absolute top-2 right-2 bg-white shadow-md hover:bg-red-50"
+        >
+          <X className="w-4 h-4 text-red-600" />
+        </Button>
+      </div>
+      {imagePreview && (
+        <p className="mt-1 text-sm text-gray-600">
+          New image selected: <span className="font-medium">{imageFile?.name}</span>
+        </p>
+      )}
+    </div>
+  )}
+</Card>
+
+
 
         {/* Basic Information */}
         <Card>
@@ -518,24 +541,58 @@ export default function EditProductPage() {
           )}
         </Card>
 
-        {/* Submit Buttons - FIXED: Now visible */}
-        <div className="flex gap-4 sticky bottom-0 bg-white p-4 rounded-lg border-2 border-primary-200 shadow-lg z-10">
-          <button
-            type="button"
-            onClick={() => router.push('/products')}
-            disabled={loading || uploadingImage}
-            className="w-32 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
-            className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {uploadingImage ? 'Uploading Image...' : loading ? 'Updating Product...' : 'Update Product'}
-          </button>
-        </div>
+       {/* Submit Buttons - Centered & Same Width */}
+<div className="
+  sticky bottom-0
+  bg-white p-5 rounded-lg
+  border-2 border-primary-200
+  shadow-lg z-10
+">
+  <div className="flex justify-center gap-6">
+    
+    {/* Cancel */}
+    <button
+      type="button"
+      onClick={() => router.push('/products')}
+      disabled={loading || uploadingImage}
+      className="
+        w-48 px-6 py-3
+        border border-gray-300
+        rounded-lg font-medium
+        text-gray-700
+        hover:bg-gray-50
+        disabled:opacity-50 disabled:cursor-not-allowed
+        transition-colors
+      "
+    >
+      Cancel
+    </button>
+
+    {/* Update Product – BLUE */}
+    <button
+      type="submit"
+      disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
+      className="
+        w-48 px-6 py-3
+        bg-blue-800 hover:bg-blue-900
+        text-white rounded-lg font-semibold
+        disabled:opacity-50 disabled:cursor-not-allowed
+        transition-colors
+        shadow-md
+      "
+    >
+      {uploadingImage
+        ? 'Uploading Image...'
+        : loading
+        ? 'Updating Product...'
+        : 'Update Product'}
+    </button>
+
+  </div>
+</div>
+
+
+
       </form>
     </div>
   );

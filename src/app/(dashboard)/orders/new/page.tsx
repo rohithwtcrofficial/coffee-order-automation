@@ -7,7 +7,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
-import { ArrowLeft, Plus, Trash2, Search, User, MapPin, AlertCircle, X, Mail, Phone, Home } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Search, User, MapPin, AlertCircle, X, Mail, Phone, Home, Package } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { collection, addDoc, serverTimestamp, getDocs, query, where, updateDoc, doc, increment } from 'firebase/firestore';
@@ -80,6 +80,7 @@ export default function NewOrderPage() {
   const [existingCustomer, setExistingCustomer] = useState<Customer | null>(null);
   const [selectedAddressId, setSelectedAddressId] = useState<string>('');
   const [useNewAddress, setUseNewAddress] = useState(false);
+  const [manualOrderNumber, setManualOrderNumber] = useState('');
   
   // Customer Information
   const [customer, setCustomer] = useState<CustomerInfo>({
@@ -324,6 +325,18 @@ export default function NewOrderPage() {
     return items.reduce((sum, item) => sum + item.subtotal, 0);
   };
 
+  const checkDuplicateOrderNumber = async (orderNum: string): Promise<boolean> => {
+  try {
+    const ordersRef = collection(db, 'orders');
+    const q = query(ordersRef, where('orderNumber', '==', orderNum.trim()));
+    const querySnapshot = await getDocs(q);
+    return !querySnapshot.empty;
+  } catch (error) {
+    console.error('Error checking duplicate order number:', error);
+    return false;
+  }
+};
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -333,6 +346,10 @@ export default function NewOrderPage() {
         throw new Error('Please fill in all customer information');
       }
 
+      if (!manualOrderNumber.trim()) {
+        throw new Error('Please enter the order number from Dukaan');
+      }
+
       if (items.some(item => !item.productId || item.pricePerUnit <= 0)) {
         throw new Error('Please select products for all order items');
       }
@@ -340,6 +357,11 @@ export default function NewOrderPage() {
       let customerId: string;
       let addressId: string;
       const totalAmount = calculateTotal();
+      const isDuplicate = await checkDuplicateOrderNumber(manualOrderNumber);
+
+      if (isDuplicate) {
+        throw new Error('This order number already exists in the system. Please check Dukaan and enter a unique order number.');
+        }
 
       let addressToUse: Address | CustomerInfo;
       if (existingCustomer && !useNewAddress && selectedAddressId) {
@@ -416,7 +438,7 @@ export default function NewOrderPage() {
         customerId = customerRef.id;
       }
 
-      const orderNumber = `ORD-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`;
+      const orderNumber = manualOrderNumber.trim();
 
       await addDoc(collection(db, 'orders'), {
         orderNumber,
@@ -460,6 +482,16 @@ export default function NewOrderPage() {
     const product = products.find(p => p.id === item.productId);
     return product?.availableGrams || [];
   };
+
+  const getAvailableProductsForItem = (currentIndex: number) => {
+  // Get all already selected product IDs except the current item
+  const selectedProductIds = items
+    .map((item, idx) => idx !== currentIndex ? item.productId : null)
+    .filter(id => id !== null && id !== '');
+  
+  // Filter out already selected products
+  return products.filter(p => !selectedProductIds.includes(p.id));
+};
 
   return (
     <div className="space-y-6 pb-32">
@@ -539,7 +571,7 @@ export default function NewOrderPage() {
 
           {/* Existing Customer Info */}
           {existingCustomer && (
-            <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg shadow-sm">
+            <div className="p-4 bg-linear-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-lg shadow-sm">
               <div className="flex items-start justify-between mb-3">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -673,7 +705,7 @@ export default function NewOrderPage() {
                         <p className="text-xs text-gray-500 mt-1">{addr.country}</p>
                       </div>
                       {selectedAddressId === addr.id && (
-                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                           <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
                         </div>
                       )}
@@ -683,7 +715,7 @@ export default function NewOrderPage() {
               </div>
             ) : existingCustomer && existingCustomer.addresses?.length === 0 && !useNewAddress ? (
               <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-yellow-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-yellow-900">No saved addresses</p>
                   <p className="text-xs text-yellow-700 mt-1">This customer doesn't have any saved addresses yet. Please add one below.</p>
@@ -719,7 +751,7 @@ export default function NewOrderPage() {
 
             {(useNewAddress || !existingCustomer || existingCustomer.addresses?.length === 0) && (
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg border-2 border-gray-200">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-linear-to-br from-gray-50 to-blue-50 rounded-lg border-2 border-gray-200">
                   <Input
                     label="Address Label"
                     value={customer.label}
@@ -768,15 +800,54 @@ export default function NewOrderPage() {
           </Card>
         )}
 
+        {/* Manual Order Number Input */}
+<Card>
+  <div className="flex items-center gap-2 mb-4">
+    <Package className="w-5 h-5 text-purple-600" />
+    <h2 className="text-lg font-semibold text-gray-900">Order Number</h2>
+  </div>
+  
+  <div className="bg-linear-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-lg p-4">
+    <Input
+      label="Order Number from Dukaan *"
+      value={manualOrderNumber}
+      onChange={(e) => setManualOrderNumber(e.target.value)}
+      placeholder="Enter order number (e.g., 22456989)"
+      required
+      className="font-mono text-lg"
+    />
+    <p className="text-xs text-purple-700 mt-2 flex items-center gap-2">
+      <AlertCircle className="w-4 h-4" />
+      Enter the exact order number from Dukaan website
+    </p>
+  </div>
+</Card>
+
         {/* Order Items */}
         <Card>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
-            <Button type="button" onClick={addItem} variant="outline" size="sm">
-              <Plus className="w-4 h-4 mr-1" />
-              Add Item
-            </Button>
+          <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
+          <Button 
+            type="button" 
+            onClick={addItem} 
+            variant="outline" 
+            size="sm"
+            disabled={items.filter(i => i.productId).length >= products.length}
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            Add Item
+          </Button>
+        </div>
+
+        {/* Add this warning message below the header */}
+        {items.filter(i => i.productId).length >= products.length && (
+          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <p className="text-sm text-amber-800">
+              All available products have been added to the order.
+            </p>
           </div>
+        )}
 
           <div className="space-y-4">
             {items.map((item, index) => (
@@ -796,16 +867,19 @@ export default function NewOrderPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <Select
-                    label="Select Product *"
-                    value={item.productId}
-                    onChange={(e) => updateItemProduct(index, e.target.value)}
-                    options={[
-                      { value: '', label: '-- Select Product --' },
-                      ...products.map(p => ({ value: p.id, label: p.name }))
-                    ]}
-                    required
-                  />
+                <Select
+                label={`Select Product * (${getAvailableProductsForItem(index).length} available)`}
+                value={item.productId}
+                onChange={(e) => updateItemProduct(index, e.target.value)}
+                options={[
+                  { value: '', label: '-- Select Product --' },
+                  ...getAvailableProductsForItem(index).map(p => ({ 
+                    value: p.id, 
+                    label: p.name 
+                  }))
+                ]}
+                required
+              />
 
                   {item.productId && (
                     <>
@@ -861,36 +935,43 @@ export default function NewOrderPage() {
         </Card>
 
         {/* Submit Buttons - Fixed positioning */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-lg z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => router.push('/orders')}
-                disabled={loading}
-                className="w-32"
-              >
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                loading={loading} 
-                disabled={loading || items.some(i => !i.productId) || !searchQuery}
-                className="flex-1"
-              >
-                {loading ? 'Creating Order...' : 'Create Order'}
-              </Button>
-            </div>
-          </div>
-        </div>
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-9999">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="flex gap-4">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => router.push('/orders')}
+        disabled={loading}
+        className="flex-1 border-2 border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold py-3"
+      >
+        Cancel
+      </Button>
+      <Button 
+  type="submit" 
+  loading={loading} 
+  disabled={loading || items.some(i => !i.productId) || !searchQuery || !manualOrderNumber.trim()}
+ className="
+  flex-1
+  bg-linear-to-r from-stone-950 via-amber-950 to-brown-900
+  hover:from-stone-900 hover:via-amber-900 hover:to-brown-800
+  text-white font-bold py-3
+  shadow-[0_12px_40px_rgba(74,44,22,0.75)]
+"
+>
+  {loading ? 'Creating Order...' : 'Create Order'}
+</Button>
+
+    </div>
+  </div>
+</div>
       </form>
 
       {/* Customer Search Results Modal */}
       {showSearchModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
-            <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+            <div className="p-6 border-b border-gray-200 bg-linear-to-r from-blue-50 to-indigo-50">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">Search Results</h3>
@@ -917,7 +998,7 @@ export default function NewOrderPage() {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-md">
+                        <div className="w-12 h-12 bg-linear-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center shadow-md">
                           <User className="w-6 h-6 text-white" />
                         </div>
                         <div>

@@ -1,6 +1,34 @@
 {
-  "css.customData": [".vscode/css-custom-data.json"],
-  "css.lint.unknownAtRules": "ignore",
-  "scss.lint.unknownAtRules": "ignore",
-  "less.lint.unknownAtRules": "ignore"
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+
+  "eslint.rules.customizations": [
+    {
+      "rule": "@typescript-eslint/no-explicit-any",
+      "severity": "off"
+    },
+    {
+      "rule": "react/no-unescaped-entities",
+      "severity": "off"
+    },
+    {
+      "rule": "@typescript-eslint/no-unused-vars",
+      "severity": "off"
+    }
+  ],
+
+  "eslint.run": "onType",
+  "eslint.quiet": true,
+
+  // 🔥 ADD THESE FOR TAILWIND
+  "tailwindCSS.lint.cssConflict": "ignore",
+  "tailwindCSS.lint.invalidScreen": "ignore",
+  "tailwindCSS.lint.invalidVariant": "ignore",
+  "tailwindCSS.lint.invalidTailwindDirective": "ignore",
+  "tailwindCSS.lint.recommendedVariantOrder": "ignore",
+  "tailwindCSS.lint.candidateClass": "ignore"
 }

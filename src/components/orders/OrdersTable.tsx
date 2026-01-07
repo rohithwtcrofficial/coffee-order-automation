@@ -97,7 +97,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       {/* Summary Stats */}
       {filteredOrders.length > 0 && (
   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+    <div className="bg-linear-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
       <div className="flex items-center gap-2 text-blue-600 mb-1">
         <Package className="w-4 h-4" />
         <span className="text-sm font-medium">Total Orders</span>
@@ -105,7 +105,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       <div className="text-2xl font-bold text-blue-900">{filteredOrders.length}</div>
     </div>
     
-    <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg">
+    <div className="bg-linear-to-br from-green-50 to-green-100 p-4 rounded-lg">
       <div className="flex items-center gap-2 text-green-600 mb-1">
         <DollarSign className="w-4 h-4" />
         <span className="text-sm font-medium">Total Revenue</span>
@@ -115,7 +115,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       </div>
     </div>
     
-    <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+    <div className="bg-linear-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
       <div className="flex items-center gap-2 text-purple-600 mb-1">
         <Package className="w-4 h-4" />
         <span className="text-sm font-medium">Total Items</span>
@@ -127,7 +127,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
       </div>
     </div>
     
-    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
+    <div className="bg-linear-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
       <div className="flex items-center gap-2 text-orange-600 mb-1">
         <DollarSign className="w-4 h-4" />
         <span className="text-sm font-medium">Avg Order Value</span>

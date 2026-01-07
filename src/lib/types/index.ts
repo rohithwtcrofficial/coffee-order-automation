@@ -14,11 +14,11 @@ export type RoastLevel =
   | 'MEDIUM_DARK' 
   | 'DARK';
 
-export type ProductCategory = 
-  | 'Single Origin' 
-  | 'Blend' 
-  | 'Decaf' 
-  | 'Special Edition';
+export type ProductCategory =
+  | 'COFFEE_BEANS'
+  | 'FILTER_COFFEE'
+  | 'INSTANT_COFFEE'
+  | 'TEA';
 
 // Admin
 export interface Admin {

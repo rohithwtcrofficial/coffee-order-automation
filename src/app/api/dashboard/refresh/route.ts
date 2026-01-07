@@ -1,7 +1,6 @@
-// src/app/(dashboard)/dashboard/page.tsx
+// src/app/api/dashboard/refresh/route.ts
+import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase/admin';
-import DashboardClient from '@/components/dashboard/DashboardClient';
-import type { Order, Customer, Product } from '@/lib/types/order';
 
 // Helper function to serialize Firestore data
 function serializeFirestoreData<T>(data: any): T {
@@ -14,7 +13,7 @@ function serializeFirestoreData<T>(data: any): T {
   }));
 }
 
-async function getDashboardData() {
+export async function GET() {
   try {
     const [ordersSnapshot, customersSnapshot, productsSnapshot] = await Promise.all([
       adminDb.collection('orders').orderBy('createdAt', 'desc').get(),
@@ -22,7 +21,7 @@ async function getDashboardData() {
       adminDb.collection('products').where('isActive', '==', true).get(),
     ]);
 
-    const orders: Order[] = ordersSnapshot.docs.map(doc => {
+    const orders = ordersSnapshot.docs.map(doc => {
       const data = doc.data();
       return serializeFirestoreData({
         id: doc.id,
@@ -32,7 +31,7 @@ async function getDashboardData() {
       });
     });
 
-    const customers: Customer[] = customersSnapshot.docs.map(doc => {
+    const customers = customersSnapshot.docs.map(doc => {
       const data = doc.data();
       return serializeFirestoreData({
         id: doc.id,
@@ -42,7 +41,7 @@ async function getDashboardData() {
       });
     });
 
-    const products: Product[] = productsSnapshot.docs.map(doc => {
+    const products = productsSnapshot.docs.map(doc => {
       const data = doc.data();
       return serializeFirestoreData({
         id: doc.id,
@@ -52,25 +51,12 @@ async function getDashboardData() {
       });
     });
 
-    return { orders, customers, products };
+    return NextResponse.json({ orders, customers, products });
   } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    return {
-      orders: [],
-      customers: [],
-      products: [],
-    };
+    console.error('Error refreshing dashboard data:', error);
+    return NextResponse.json(
+      { error: 'Failed to refresh dashboard data' },
+      { status: 500 }
+    );
   }
-}
-
-export default async function DashboardPage() {
-  const { orders, customers, products } = await getDashboardData();
-
-  return (
-    <DashboardClient
-      initialOrders={orders}
-      initialCustomers={customers}
-      initialProducts={products}
-    />
-  );
 }

@@ -15,10 +15,10 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase/client';
 
 const categoryOptions = [
-  { value: 'Single Origin', label: 'Single Origin' },
-  { value: 'Blend', label: 'Blend' },
-  { value: 'Decaf', label: 'Decaf' },
-  { value: 'Special Edition', label: 'Special Edition' },
+  { value: 'COFFEE_BEANS', label: 'Coffee Beans' },
+  { value: 'FILTER_COFFEE', label: 'Filter Coffee' },
+  { value: 'INSTANT_COFFEE', label: 'Instant Coffee' },
+  { value: 'TEA', label: 'Tea' },
 ];
 
 const roastLevelOptions = [

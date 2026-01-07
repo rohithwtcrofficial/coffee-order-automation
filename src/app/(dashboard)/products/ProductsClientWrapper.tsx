@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Edit, Trash2, X, AlertTriangle } from 'lucide-react';
+import { Edit, Trash2, X, AlertTriangle, MoreVertical, Package } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { doc, deleteDoc } from 'firebase/firestore';
@@ -27,27 +27,28 @@ function DeleteModal({ isOpen, onClose, onConfirm, productName, loading }: Delet
 
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop with blur */}
       <div 
-        className="fixed inset-0 z-40 bg-black bg-opacity-50 transition-opacity"
+        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-all duration-300"
         onClick={onClose}
       />
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
           <div className="p-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                  <AlertTriangle className="w-6 h-6 text-red-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900">Delete Product</h3>
+            <div className="flex items-start gap-4 mb-6">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">Delete Product</h3>
+                <p className="text-sm text-gray-500">This action cannot be undone</p>
               </div>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg"
                 disabled={loading}
               >
                 <X className="w-5 h-5" />
@@ -55,13 +56,13 @@ function DeleteModal({ isOpen, onClose, onConfirm, productName, loading }: Delet
             </div>
 
             {/* Content */}
-            <div className="mb-6 ml-15">
-              <p className="text-gray-600 mb-2">
+            <div className="mb-6 bg-red-50 border border-red-100 rounded-xl p-4">
+              <p className="text-gray-700 mb-2">
                 Are you sure you want to delete{' '}
-                <span className="font-semibold text-gray-900">&quot;{productName}&quot;</span>?
+                <span className="font-bold text-gray-900">&quot;{productName}&quot;</span>?
               </p>
-              <p className="text-sm text-red-600">
-                This action cannot be undone. All product data will be permanently removed.
+              <p className="text-sm text-red-700 font-medium">
+                All product data will be permanently removed.
               </p>
             </div>
 
@@ -72,18 +73,112 @@ function DeleteModal({ isOpen, onClose, onConfirm, productName, loading }: Delet
                 variant="outline"
                 onClick={onClose}
                 disabled={loading}
-                className="flex-1"
+                className="flex-1 border-2"
               >
                 Cancel
               </Button>
               <button
                 onClick={onConfirm}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-red-600/30"
               >
                 {loading ? 'Deleting...' : 'Delete Product'}
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+interface ActionsModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  product: Product;
+  onDelete: () => void;
+}
+
+function ActionsModal({ isOpen, onClose, product, onDelete }: ActionsModalProps) {
+  if (!isOpen) return null;
+
+  return (
+    <>
+      {/* Backdrop with blur */}
+      <div 
+        className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-all duration-300"
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md transform transition-all duration-300">
+          {/* Handle bar for mobile */}
+          <div className="flex justify-center pt-3 pb-2 sm:hidden">
+            <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
+          </div>
+          
+          <div className="p-6">
+            {/* Product Info */}
+            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200">
+              {product.imageUrl ? (
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-16 h-16 rounded-xl object-cover"
+                />
+              ) : (
+                <div className="w-16 h-16 rounded-xl bg-linear-to-br from-amber-100 to-amber-200 flex items-center justify-center">
+                  <Package className="w-8 h-8 text-amber-700" />
+                </div>
+              )}
+              <div className="flex-1">
+                <h3 className="font-bold text-gray-900 text-lg mb-1">{product.name}</h3>
+                <p className="text-sm text-gray-500">{product.category}</p>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2">
+              <Link href={`/products/${product.id}/edit`} className="block">
+                <button 
+                  onClick={onClose}
+                  className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-blue-50 transition-colors group"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center transition-colors">
+                    <Edit className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div className="flex-1 text-left">
+                    <p className="font-semibold text-gray-900">Edit Product</p>
+                    <p className="text-sm text-gray-500">Update product details</p>
+                  </div>
+                </button>
+              </Link>
+              
+              <button 
+                onClick={() => {
+                  onClose();
+                  onDelete();
+                }}
+                className="w-full flex items-center gap-3 p-4 rounded-xl hover:bg-red-50 transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-lg bg-red-100 group-hover:bg-red-200 flex items-center justify-center transition-colors">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <div className="flex-1 text-left">
+                  <p className="font-semibold text-gray-900">Delete Product</p>
+                  <p className="text-sm text-gray-500">Permanently remove this product</p>
+                </div>
+              </button>
+            </div>
+
+            {/* Cancel Button */}
+            <button
+              onClick={onClose}
+              className="w-full mt-4 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       </div>
@@ -98,11 +193,19 @@ interface ProductsClientWrapperProps {
 export default function ProductsClientWrapper({ products: initialProducts }: ProductsClientWrapperProps) {
   const router = useRouter();
   const [products, setProducts] = useState(initialProducts);
+  const [actionsModal, setActionsModal] = useState<{
+    isOpen: boolean;
+    product: Product | null;
+  }>({ isOpen: false, product: null });
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     product: Product | null;
   }>({ isOpen: false, product: null });
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const handleActionsClick = (product: Product) => {
+    setActionsModal({ isOpen: true, product });
+  };
 
   const handleDeleteClick = (product: Product) => {
     setDeleteModal({ isOpen: true, product });
@@ -123,7 +226,6 @@ export default function ProductsClientWrapper({ products: initialProducts }: Pro
           await deleteObject(imageRef);
         } catch (imageError) {
           console.error('Error deleting image:', imageError);
-          // Continue even if image deletion fails
         }
       }
 
@@ -146,20 +248,18 @@ export default function ProductsClientWrapper({ products: initialProducts }: Pro
     }
   };
 
-  const handleDeleteCancel = () => {
-    setDeleteModal({ isOpen: false, product: null });
-  };
-
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {products.map((product) => (
-          <Card key={product.id} className="hover:shadow-lg transition-shadow overflow-hidden">
-            <div className="space-y-4">
-              {/* Product Image */}
+          <div 
+            key={product.id} 
+            className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-amber-200"
+          >
+            {/* Product Image */}
+            <div className="relative">
               {product.imageUrl ? (
-                <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                <div className="relative w-full h-48 sm:h-56 bg-linear-to-br from-gray-100 to-gray-200">
                   <img
                     src={product.imageUrl}
                     alt={product.name}
@@ -167,69 +267,83 @@ export default function ProductsClientWrapper({ products: initialProducts }: Pro
                   />
                 </div>
               ) : (
-                <div className="relative w-full h-48 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <svg
-                    className="w-12 h-12 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
+                <div className="relative w-full h-48 sm:h-56 bg-linear-to-br from-amber-50 to-amber-100 flex items-center justify-center">
+                  <Package className="w-16 h-16 text-amber-300" />
                 </div>
               )}
-
-              {/* Product Header */}
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{product.name}</h3>
-                  <p className="text-sm text-gray-600">{product.category}</p>
-                </div>
-                <Badge variant={product.isActive ? 'success' : 'danger'}>
+              
+              {/* Status Badge */}
+              <div className="absolute top-3 left-3">
+                <Badge 
+                  variant={product.isActive ? 'success' : 'danger'}
+                  className="shadow-lg backdrop-blur-sm bg-opacity-90"
+                >
                   {product.isActive ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
 
-              {/* Product Details */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Roast Level:</span>
-                  <span className="font-medium text-gray-900">{product.roastLevel}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Stock:</span>
-                  <span
-                    className={`font-medium ${
-                      product.stockQuantity === 0 ? 'text-red-600' : 'text-gray-900'
-                    }`}
-                  >
-                    {product.stockQuantity}
-                    {product.stockQuantity === 0 && ' (Out of Stock)'}
+              {/* Actions Button */}
+              <button
+                onClick={() => handleActionsClick(product)}
+                className="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
+              >
+                <MoreVertical className="w-5 h-5 text-gray-700" />
+              </button>
+
+              {/* Stock Badge */}
+              {product.stockQuantity === 0 && (
+                <div className="absolute bottom-3 right-3">
+                  <span className="px-3 py-1.5 bg-red-600 text-white text-xs font-bold rounded-full shadow-lg">
+                    Out of Stock
                   </span>
                 </div>
-                {product.origin && (
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Origin:</span>
-                    <span className="font-medium text-gray-900">{product.origin}</span>
-                  </div>
-                )}
+              )}
+            </div>
+
+            {/* Product Content */}
+            <div className="p-4 space-y-3">
+              {/* Product Header */}
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">
+                  {product.name}
+                </h3>
+                <p className="text-sm text-gray-500 font-medium">{product.category}</p>
               </div>
+
+              {/* Product Details Grid */}
+              <div className="grid grid-cols-2 gap-2 py-2">
+                <div className="bg-amber-50 rounded-lg p-2">
+                  <p className="text-xs text-amber-700 font-medium mb-0.5">Roast</p>
+                  <p className="text-sm font-bold text-amber-900">{product.roastLevel}</p>
+                </div>
+                <div className="bg-blue-50 rounded-lg p-2">
+                  <p className="text-xs text-blue-700 font-medium mb-0.5">Stock</p>
+                  <p className={`text-sm font-bold ${product.stockQuantity === 0 ? 'text-red-600' : 'text-blue-900'}`}>
+                    {product.stockQuantity} units
+                  </p>
+                </div>
+              </div>
+
+              {/* Origin */}
+              {product.origin && (
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-gray-500">📍</span>
+                  <span className="font-medium text-gray-700">{product.origin}</span>
+                </div>
+              )}
 
               {/* Available Sizes */}
               <div>
-                <p className="text-sm text-gray-600 mb-2">Available Sizes:</p>
-                <div className="flex flex-wrap gap-2">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  Available Sizes
+                </p>
+                <div className="flex flex-wrap gap-1.5">
                   {product.availableGrams.map((grams) => (
                     <span
                       key={grams}
-                      className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
+                      className="px-2.5 py-1 bg-linear-to-r from-amber-100 to-orange-100 text-amber-900 rounded-lg text-xs font-bold"
                     >
-                      {grams}g - ₹{(product.pricePerVariant[grams] || 0).toFixed(2)}
+                      {grams}g • ₹{(product.pricePerVariant[grams] || 0).toFixed(0)}
                     </span>
                   ))}
                 </div>
@@ -238,51 +352,45 @@ export default function ProductsClientWrapper({ products: initialProducts }: Pro
               {/* Tasting Notes */}
               {product.tastingNotes && product.tastingNotes.length > 0 && (
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Tasting Notes:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {product.tastingNotes.map((note) => (
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                    Tasting Notes
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {product.tastingNotes.slice(0, 3).map((note) => (
                       <span
                         key={note}
-                        className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-xs"
+                        className="px-2 py-0.5 bg-purple-100 text-purple-800 rounded-md text-xs font-medium"
                       >
                         {note}
                       </span>
                     ))}
+                    {product.tastingNotes.length > 3 && (
+                      <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-md text-xs font-medium">
+                        +{product.tastingNotes.length - 3}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
-
-              {/* Description */}
-              {product.description && (
-                <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
-              )}
-
-              {/* Actions */}
-              <div className="flex gap-2 pt-4 border-t border-gray-200">
-                <Link href={`/products/${product.id}/edit`} className="flex-1">
-                  <Button variant="outline" size="sm" className="w-full">
-                    <Edit className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteClick(product)}
-                  className="hover:bg-red-50"
-                >
-                  <Trash2 className="w-4 h-4 text-red-600" />
-                </Button>
-              </div>
             </div>
-          </Card>
+          </div>
         ))}
       </div>
+
+      {/* Actions Modal */}
+      {actionsModal.product && (
+        <ActionsModal
+          isOpen={actionsModal.isOpen}
+          onClose={() => setActionsModal({ isOpen: false, product: null })}
+          product={actionsModal.product}
+          onDelete={() => handleDeleteClick(actionsModal.product!)}
+        />
+      )}
 
       {/* Delete Modal */}
       <DeleteModal
         isOpen={deleteModal.isOpen}
-        onClose={handleDeleteCancel}
+        onClose={() => setDeleteModal({ isOpen: false, product: null })}
         onConfirm={handleDeleteConfirm}
         productName={deleteModal.product?.name || ''}
         loading={deleteLoading}
