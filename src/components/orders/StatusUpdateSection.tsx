@@ -16,12 +16,12 @@ interface StatusUpdateSectionProps {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'PLACED', label: 'Order Placed', icon: '📦', color: 'from-yellow-500 to-orange-500', description: 'Order has been received' },
-  { value: 'PROCESSING', label: 'Processing', icon: '⚙️', color: 'from-blue-500 to-indigo-500', description: 'Order is being prepared' },
-  { value: 'PACKED', label: 'Packed', icon: '📦', color: 'from-indigo-500 to-purple-500', description: 'Order is packed and ready' },
-  { value: 'SHIPPED', label: 'Shipped', icon: '🚚', color: 'from-purple-500 to-pink-500', description: 'Order is in transit', requiresTracking: true },
-  { value: 'DELIVERED', label: 'Delivered', icon: '✅', color: 'from-green-500 to-emerald-500', description: 'Order has been delivered', requiresTracking: true },
-  { value: 'CANCELLED', label: 'Cancelled', icon: '❌', color: 'from-red-500 to-rose-500', description: 'Order has been cancelled' },
+  { value: 'RECEIVED', label: 'Order Received', icon: '📥', color: 'from-blue-500 to-cyan-500', description: 'Order has been received' },
+  { value: 'ACCEPTED', label: 'Order Accepted', icon: '✅', color: 'from-green-500 to-emerald-500', description: 'Order has been accepted' },
+  { value: 'PACKED', label: 'Order Packed', icon: '📦', color: 'from-indigo-500 to-purple-500', description: 'Order is packed and ready' },
+  { value: 'SHIPPED', label: 'Order Shipped', icon: '🚚', color: 'from-purple-500 to-pink-500', description: 'Order is in transit', requiresTracking: true },
+  { value: 'DELIVERED', label: 'Order Delivered', icon: '🎉', color: 'from-green-600 to-teal-600', description: 'Order has been delivered' },
+  { value: 'CANCELLED', label: 'Order Cancelled', icon: '❌', color: 'from-red-500 to-rose-500', description: 'Order has been cancelled' },
 ];
 
 export function StatusUpdateSection({ orderId, currentStatus, orderNumber, currentTrackingId }: StatusUpdateSectionProps) {
@@ -47,9 +47,9 @@ export function StatusUpdateSection({ orderId, currentStatus, orderNumber, curre
   const handleProceedToConfirm = () => {
     const selectedStatusObj = STATUS_OPTIONS.find(s => s.value === selectedStatus);
     
-    // Validate tracking ID for shipped/delivered status
+    // Validate tracking ID for shipped status
     if (selectedStatusObj?.requiresTracking && !trackingId.trim()) {
-      setError('Tracking ID is required for shipped/delivered orders');
+      setError('Tracking ID is required for shipped orders');
       return;
     }
 
@@ -209,7 +209,7 @@ export function StatusUpdateSection({ orderId, currentStatus, orderNumber, curre
                   disabled={isUpdating}
                 />
                 <p className="text-xs text-blue-700 mt-2">
-                  Tracking ID is required for shipped/delivered orders
+                  Tracking ID is required for shipped orders
                 </p>
               </div>
             )}

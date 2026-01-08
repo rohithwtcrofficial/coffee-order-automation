@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Instant Coffee - South Blend",
+    "price": 330,
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/bfe99f83-ade5-4b12-a796-afa1508e558d.png",
+    "link": "https://westernterraincoffee.com/products/instant-coffee-south-blend?sku_id=58874547"
+  },
+  {
+    "name": "Instant Coffee Pure",
+    "price": 195,
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/b01ab228-137d-4e94-b5d6-5043d7c06363.png",
+    "link": "https://westernterraincoffee.com/products/instant-coffee-pure?sku_id=58874532"
+  },
+  {
+    "name": "Premium Filter Coffee - Strong Roast",
+    "price": 295,
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/d8b66d34-f2e7-4172-b20d-1178cf3be0d4.png",
+    "link": "https://westernterraincoffee.com/products/filter-coffee-strong-roast?sku_id=58874480"
+  }
+]

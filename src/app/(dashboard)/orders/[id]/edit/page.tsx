@@ -20,7 +20,7 @@ export default function OrderEditPage({
   const { id: orderId } = use(params);
 
   const router = useRouter();
-  const [status, setStatus] = useState('PLACED');
+  const [status, setStatus] = useState('RECEIVED');
   const [trackingId, setTrackingId] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -49,11 +49,12 @@ export default function OrderEditPage({
   value={status}
   onChange={(e) => setStatus(e.target.value)}
   options={[
-    { label: 'Placed', value: 'PLACED' },
-    { label: 'Processing', value: 'PROCESSING' },
-    { label: 'Shipped', value: 'SHIPPED' },
-    { label: 'Delivered', value: 'DELIVERED' },
-    { label: 'Cancelled', value: 'CANCELLED' },
+    { label: 'Order Received', value: 'RECEIVED' },
+    { label: 'Order Accepted', value: 'ACCEPTED' },
+    { label: 'Order Packed', value: 'PACKED' },
+    { label: 'Order Shipped', value: 'SHIPPED' },
+    { label: 'Order Delivered', value: 'DELIVERED' },
+    { label: 'Order Cancelled', value: 'CANCELLED' },
   ]}
 />
 

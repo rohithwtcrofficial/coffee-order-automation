@@ -24,7 +24,6 @@
   "eslint.run": "onType",
   "eslint.quiet": true,
 
-  // 🔥 ADD THESE FOR TAILWIND
   "tailwindCSS.lint.cssConflict": "ignore",
   "tailwindCSS.lint.invalidScreen": "ignore",
   "tailwindCSS.lint.invalidVariant": "ignore",

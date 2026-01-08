@@ -24,7 +24,7 @@ export async function updateOrderStatus(
       };
     }
 
-    const validStatuses = ['PLACED', 'PROCESSING', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+    const validStatuses = ['RECEIVED', 'ACCEPTED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
     if (!validStatuses.includes(newStatus)) {
       return {
         success: false,
@@ -32,11 +32,11 @@ export async function updateOrderStatus(
       };
     }
 
-    // Validate tracking ID for shipped/delivered status
-    if ((newStatus === 'SHIPPED' || newStatus === 'DELIVERED') && !trackingId?.trim()) {
+    // Validate tracking ID for shipped status
+    if (newStatus === 'SHIPPED' && !trackingId?.trim()) {
       return {
         success: false,
-        error: 'Tracking ID is required for shipped/delivered orders',
+        error: 'Tracking ID is required for shipped orders',
       };
     }
 
@@ -59,13 +59,12 @@ export async function updateOrderStatus(
       updatedAt: FieldValue.serverTimestamp(),
     };
 
-    // Add or remove tracking ID based on status
-    if (trackingId?.trim()) {
-      updateData.trackingId = trackingId.trim();
-    } else if (newStatus !== 'SHIPPED' && newStatus !== 'DELIVERED') {
-      // Remove tracking ID if status doesn't require it
-      updateData.trackingId = FieldValue.delete();
-    }
+    // Add or update tracking ID
+if (trackingId?.trim()) {
+  updateData.trackingId = trackingId.trim();
+}
+// Note: Tracking ID is kept when status changes to DELIVERED
+// It's only removed when changing to non-shipping statuses
 
     // Update the order in Firestore
     await orderRef.update(updateData);

@@ -441,26 +441,40 @@ export default function NewOrderPage() {
       const orderNumber = manualOrderNumber.trim();
 
       await addDoc(collection(db, 'orders'), {
-        orderNumber,
-        customerId,
-        deliveryAddressId: addressId,
-        items: items.map(item => ({
-          productId: item.productId,
-          productName: item.productName,
-          category: item.category,
-          roastLevel: item.roastLevel,
-          grams: item.grams,
-          quantity: item.quantity,
-          pricePerUnit: item.pricePerUnit,
-          subtotal: item.subtotal,
-          imageUrl: item.imageUrl,
-        })),
-        totalAmount,
-        currency: 'INR',
-        status: 'PLACED',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+  orderNumber,
+  customerId,
+
+  // 🔒 ADDRESS SNAPSHOT (IMMUTABLE)
+  deliveryAddress: {
+    id: addressId,
+    label: addressToUse.label || 'Delivery',
+    street: addressToUse.street,
+    city: addressToUse.city,
+    state: addressToUse.state,
+    postalCode: addressToUse.postalCode,
+    country: addressToUse.country,
+  },
+
+  items: items.map(item => ({
+    productId: item.productId,
+    productName: item.productName,
+    category: item.category,
+    roastLevel: item.roastLevel,
+    grams: item.grams,
+    quantity: item.quantity,
+    pricePerUnit: item.pricePerUnit,
+    subtotal: item.subtotal,
+    imageUrl: item.imageUrl,
+  })),
+
+  totalAmount,
+  currency: 'INR',
+  status: 'RECEIVED',
+
+  createdAt: serverTimestamp(),
+  updatedAt: serverTimestamp(),
+});
+
 
       toast.success(
         existingCustomer 
@@ -947,20 +961,21 @@ export default function NewOrderPage() {
       >
         Cancel
       </Button>
-      <Button 
-  type="submit" 
-  loading={loading} 
-  disabled={loading || items.some(i => !i.productId) || !searchQuery || !manualOrderNumber.trim()}
- className="
-  flex-1
-  bg-linear-to-r from-stone-950 via-amber-950 to-brown-900
-  hover:from-stone-900 hover:via-amber-900 hover:to-brown-800
-  text-white font-bold py-3
-  shadow-[0_12px_40px_rgba(74,44,22,0.75)]
-"
+      <Button
+  type="submit"
+  loading={loading}
+  disabled={loading}
+  className="
+    flex-1
+    bg-linear-to-r from-stone-950 via-amber-950 to-brown-900
+    hover:from-stone-900 hover:via-amber-900 hover:to-brown-800
+    text-white font-bold py-3
+    shadow-[0_12px_40px_rgba(74,44,22,0.75)]
+  "
 >
   {loading ? 'Creating Order...' : 'Create Order'}
 </Button>
+
 
     </div>
   </div>

@@ -1,12 +1,9 @@
-// src/app/(dashboard)/dashboard/page.tsx
 import { adminDb } from '@/lib/firebase/admin';
 import DashboardClient from '@/components/dashboard/DashboardClient';
-import type { Order, Customer, Product } from '@/lib/types/order';
+import type { Order, Customer, Product } from '@/lib/types';
 
-// Helper function to serialize Firestore data
 function serializeFirestoreData<T>(data: any): T {
   return JSON.parse(JSON.stringify(data, (key, value) => {
-    // Convert Firestore Timestamps to ISO strings
     if (value && typeof value === 'object' && value._seconds !== undefined) {
       return new Date(value._seconds * 1000).toISOString();
     }
@@ -19,7 +16,7 @@ async function getDashboardData() {
     const [ordersSnapshot, customersSnapshot, productsSnapshot] = await Promise.all([
       adminDb.collection('orders').orderBy('createdAt', 'desc').get(),
       adminDb.collection('customers').get(),
-      adminDb.collection('products').where('isActive', '==', true).get(),
+      adminDb.collection('products').get(),
     ]);
 
     const orders: Order[] = ordersSnapshot.docs.map(doc => {
@@ -38,7 +35,6 @@ async function getDashboardData() {
         id: doc.id,
         ...data,
         createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date(),
       });
     });
 
@@ -56,9 +52,9 @@ async function getDashboardData() {
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
     return {
-      orders: [],
-      customers: [],
-      products: [],
+      orders: [] as Order[],
+      customers: [] as Customer[],
+      products: [] as Product[],
     };
   }
 }
@@ -68,9 +64,9 @@ export default async function DashboardPage() {
 
   return (
     <DashboardClient
-      initialOrders={orders}
-      initialCustomers={customers}
-      initialProducts={products}
+      orders={orders}
+      customers={customers}
+      products={products}
     />
   );
 }

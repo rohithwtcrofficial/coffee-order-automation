@@ -43,7 +43,7 @@ export interface Order {
   items: OrderItem[];
   totalAmount: number;
   currency: string;
-  status: 'PLACED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  status: 'RECEIVED' | 'ACCEPTED' | 'PACKED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
   trackingId?: string;
   createdAt: Date | string;
   updatedAt: Date | string;

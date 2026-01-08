@@ -50,6 +50,10 @@ export default function NewProductPage() {
   // Image handling
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [imageInputMode, setImageInputMode] = useState<'upload' | 'url'>('upload');
+  const [imageUrlInput, setImageUrlInput] = useState('');
+  const [imageFromUrl, setImageFromUrl] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Variants (grams and prices)
   const [variants, setVariants] = useState<Variant[]>([
@@ -61,35 +65,22 @@ export default function NewProductPage() {
   const [newNote, setNewNote] = useState('');
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      // Validate file type
-      if (!file.type.startsWith('image/')) {
-        toast.error('Please select an image file');
-        return;
-      }
-
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error('Image size must be less than 5MB');
-        return;
-      }
-
-      setImageFile(file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+  const file = e.target.files?.[0];
+  if (file) {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
     }
-  };
+    processImageFile(file);
+  }
+};
 
   const removeImage = () => {
-    setImageFile(null);
-    setImagePreview('');
-  };
+  setImageFile(null);
+  setImagePreview('');
+  setImageUrlInput('');
+  setImageFromUrl(false);
+};
 
   const uploadImage = async (): Promise<string | null> => {
     if (!imageFile) return null;
@@ -165,11 +156,13 @@ export default function NewProductPage() {
       }
 
       // Upload image if provided
-      let imageUrl: string | null = null;
-      if (imageFile) {
-        imageUrl = await uploadImage();
-      }
-
+        let imageUrl: string | null = null;
+        if (imageFile) {
+          imageUrl = await uploadImage();
+        } else if (imageFromUrl && imagePreview) {
+          // Use URL directly if image is from URL
+          imageUrl = imageUrlInput;
+        }
       // Build price per variant object
       const pricePerVariant: Record<number, number> = {};
       const availableGrams: number[] = [];
@@ -206,6 +199,70 @@ export default function NewProductPage() {
     }
   };
 
+  const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  setIsDragging(false);
+  
+  const file = e.dataTransfer.files?.[0];
+  if (file && file.type.startsWith('image/')) {
+    processImageFile(file);
+  } else {
+    toast.error('Please drop a valid image file');
+  }
+};
+
+const processImageFile = (file: File) => {
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error('Image size must be less than 5MB');
+    return;
+  }
+
+  setImageFile(file);
+  setImageFromUrl(false);
+  
+  // Create preview
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    setImagePreview(reader.result as string);
+  };
+  reader.readAsDataURL(file);
+};
+
+const handleImageUrlBlur = () => {
+  if (imageUrlInput) {
+    loadImageFromUrl();
+  }
+};
+
+const loadImageFromUrl = async () => {
+  if (!imageUrlInput.trim()) {
+    toast.error('Please enter a valid image URL');
+    return;
+  }
+
+  try {
+    // Validate URL format
+    new URL(imageUrlInput);
+    
+    // Test if image loads
+    const img = new Image();
+    img.onload = () => {
+      setImagePreview(imageUrlInput);
+      setImageFile(null);
+      setImageFromUrl(true);
+      toast.success('Image loaded successfully');
+    };
+    img.onerror = () => {
+      toast.error('Failed to load image from URL. Please check the URL.');
+    };
+    img.src = imageUrlInput;
+  } catch (error) {
+    toast.error('Invalid URL format');
+  }
+};
+
+
   return (
     <div className="space-y-6 pb-24">
       <Link 
@@ -223,126 +280,149 @@ export default function NewProductPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Product Image */}
-        <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Product Image</h2>
-          
-          {!imagePreview ? (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-primary-400 transition-colors">
-              <input
-                type="file"
-                id="product-image"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-              <label
-                htmlFor="product-image"
-                className="cursor-pointer flex flex-col items-center"
-              >
-                <Upload className="w-12 h-12 text-gray-400 mb-3" />
-                <p className="text-sm font-medium text-gray-700 mb-1">
-                  Click to upload product image
-                </p>
-                <p className="text-xs text-gray-500">
-                  PNG, JPG, WEBP up to 5MB
-                </p>
-              </label>
-            </div>
-          ) : (
-            <div className="relative">
-              <img
-                src={imagePreview}
-                alt="Product preview"
-                className="w-full h-64 object-cover rounded-lg"
-              />
-              <Button
-                type="button"
-                onClick={removeImage}
-                variant="ghost"
-                size="sm"
-                className="absolute top-2 right-2 bg-white shadow-md hover:bg-red-50"
-              >
-                <X className="w-4 h-4 text-red-600" />
-              </Button>
-              <div className="mt-2 flex items-center text-sm text-gray-600">
-                <ImageIcon className="w-4 h-4 mr-1" />
-                {imageFile?.name}
-              </div>
-            </div>
-          )}
-        </Card>
+<Card>
+  <h2 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+    Product Image
+  </h2>
 
-        {/* Basic Information */}
-        <Card>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Product Name *"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ethiopian Yirgacheffe"
-              required
+  {/* Toggle between Upload and URL */}
+  <div className="flex justify-center gap-4 mb-4">
+    <button
+      type="button"
+      onClick={() => {
+        setImageInputMode('upload');
+        setImageUrlInput('');
+      }}
+      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+          imageInputMode === 'upload'
+            ? 'bg-blue-600 text-white'
+            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+        }`}
+    >
+      Upload Image
+    </button>
+    <button
+      type="button"
+      onClick={() => {
+        setImageInputMode('url');
+        setImageFile(null);
+      }}
+      className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+        imageInputMode === 'url'
+          ? 'bg-primary-600 text-white'
+          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+      }`}
+    >
+      Image URL
+    </button>
+  </div>
+
+  {/* Show preview if image exists */}
+  {imagePreview  ? (
+    <div className="flex flex-col items-center">
+      <div className="relative w-280px aspect-4/5">
+        <img
+          src={imagePreview}
+          alt="Product preview"
+          className="w-full h-full object-cover rounded-lg border border-gray-200"
+        />
+        <Button
+          type="button"
+          onClick={removeImage}
+          variant="ghost"
+          size="sm"
+          className="absolute top-2 right-2 bg-white shadow-md hover:bg-red-50"
+        >
+          <X className="w-4 h-4 text-red-600" />
+        </Button>
+      </div>
+      {imagePreview && imageFile && (
+        <p className="mt-1 text-sm text-gray-600">
+          New image selected: <span className="font-medium">{imageFile?.name}</span>
+        </p>
+      )}
+      {imagePreview && !imageFile && imageFromUrl && (
+        <p className="mt-1 text-sm text-gray-600">
+          Image loaded from URL
+        </p>
+      )}
+    </div>
+  ) : (
+    <>
+      {/* Upload Mode */}
+      {imageInputMode === 'upload' && (
+        <div className="flex justify-center">
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleImageDrop}
+            className={`
+              w-280px aspect-4/5
+              border-2 border-dashed rounded-lg p-6
+              text-center transition-colors
+              flex flex-col justify-center
+              ${isDragging 
+                ? 'border-primary-600 bg-primary-50' 
+                : 'border-gray-300 hover:border-primary-400'
+              }
+            `}
+          >
+            <input
+              type="file"
+              id="product-image"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
             />
-            
-            <Select
-              label="Category *"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              options={categoryOptions}
-              required
-            />
-
-            <Select
-              label="Roast Level *"
-              value={roastLevel}
-              onChange={(e) => setRoastLevel(e.target.value)}
-              options={roastLevelOptions}
-              required
-            />
-
-            <Input
-              label="Origin"
-              value={origin}
-              onChange={(e) => setOrigin(e.target.value)}
-              placeholder="Ethiopia, Yirgacheffe"
-            />
-
-            <Input
-              label="Stock Quantity *"
-              type="number"
-              min="0"
-              value={stockQuantity}
-              onChange={(e) => setStockQuantity(parseInt(e.target.value) || 0)}
-              required
-            />
-
-            <div className="flex items-center gap-2 pt-6">
-              <input
-                type="checkbox"
-                id="isActive"
-                checked={isActive}
-                onChange={(e) => setIsActive(e.target.checked)}
-                className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-              />
-              <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
-                Active (Show in catalog)
-              </label>
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Description
+            <label
+              htmlFor="product-image"
+              className="cursor-pointer flex flex-col items-center"
+            >
+              <Upload className="w-10 h-10 text-gray-400 mb-3" />
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                {isDragging ? 'Drop image here' : 'Upload or drag & drop'}
+              </p>
+              <p className="text-xs text-gray-500">
+                JPG, PNG, WEBP (max 5MB)
+              </p>
             </label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-              placeholder="Describe the flavor profile, brewing recommendations, etc."
-            />
           </div>
-        </Card>
+        </div>
+      )}
+
+      {/* URL Mode */}
+      {imageInputMode === 'url' && (
+        <div className="flex flex-col items-center">
+          <div className="w-full max-w-md">
+            <Input
+              label="Image URL"
+              value={imageUrlInput}
+              onChange={(e) => setImageUrlInput(e.target.value)}
+              placeholder="https://example.com/image.jpg"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  loadImageFromUrl();
+                }
+              }}
+            />
+            <button
+              type="button"
+              onClick={loadImageFromUrl}
+              disabled={!imageUrlInput.trim()}
+              className="mt-3 w-full px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Load Image
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )}
+</Card>
 
         {/* Variants (Sizes & Prices) */}
         <Card>
@@ -435,26 +515,55 @@ export default function NewProductPage() {
           )}
         </Card>
 
-        {/* Submit Buttons - FIXED: Now visible */}
-        <div className="flex gap-4 sticky bottom-0 bg-white p-4 rounded-lg border-2 border-primary-200 shadow-lg">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push('/products')}
-            disabled={loading || uploadingImage}
-            className="w-32"
-          >
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            loading={loading || uploadingImage}
-            disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
-            className="flex-1"
-          >
-            {uploadingImage ? 'Uploading Image...' : loading ? 'Creating Product...' : 'Create Product'}
-          </Button>
-        </div>
+         {/* Submit Buttons - Centered & Same Width */}
+<div className="
+  sticky bottom-0
+  bg-white p-5 rounded-lg
+  border-2 border-primary-200
+  shadow-lg z-10
+">
+  <div className="flex justify-center gap-6">
+    
+    {/* Cancel */}
+    <button
+      type="button"
+      onClick={() => router.push('/products')}
+      disabled={loading || uploadingImage}
+      className="
+        w-48 px-6 py-3
+        border border-gray-300
+        rounded-lg font-medium
+        text-gray-700
+        hover:bg-gray-50
+        disabled:opacity-50 disabled:cursor-not-allowed
+        transition-colors
+      "
+    >
+      Cancel
+    </button>
+
+    {/* Update Product – BLUE */}
+    <button
+      type="submit"
+      disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
+      className="
+        w-48 px-6 py-3
+        bg-blue-800 hover:bg-blue-900
+        text-white rounded-lg font-semibold
+        disabled:opacity-50 disabled:cursor-not-allowed
+        transition-colors
+        shadow-md
+      "
+    >
+      {uploadingImage
+        ? 'Uploading Image...'
+        : loading
+        ? 'Creating Product...'
+        : 'Create Product'}
+    </button>
+
+  </div>
+</div>
       </form>
     </div>
   );

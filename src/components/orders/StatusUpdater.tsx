@@ -15,12 +15,12 @@ interface StatusUpdaterProps {
 }
 
 const statusOptions = [
-  { value: 'PLACED', label: 'Placed' },
-  { value: 'PROCESSING', label: 'Processing' },
-  { value: 'PACKED', label: 'Packed' },
-  { value: 'SHIPPED', label: 'Shipped' },
-  { value: 'DELIVERED', label: 'Delivered' },
-  { value: 'CANCELLED', label: 'Cancelled' },
+  { value: 'RECEIVED', label: 'Order Received' },
+  { value: 'ACCEPTED', label: 'Order Accepted' },
+  { value: 'PACKED', label: 'Order Packed' },
+  { value: 'SHIPPED', label: 'Order Shipped' },
+  { value: 'DELIVERED', label: 'Order Delivered' },
+  { value: 'CANCELLED', label: 'Order Cancelled' },
 ];
 
 export function StatusUpdater({ 

@@ -42,7 +42,7 @@ export async function createOrder(input: CreateOrderInput) {
       items: input.items,
       totalAmount: input.totalAmount,
       currency: 'INR',
-      status: 'PLACED',
+      status: 'RECEIVED',
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     };

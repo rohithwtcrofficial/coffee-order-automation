@@ -8,12 +8,12 @@ interface OrderStatusBadgeProps {
 
 export function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
   const statusConfig: Record<OrderStatus, { variant: 'default' | 'success' | 'warning' | 'danger' | 'info'; label: string }> = {
-    PLACED: { variant: 'info', label: 'Placed' },
-    PROCESSING: { variant: 'warning', label: 'Processing' },
-    PACKED: { variant: 'default', label: 'Packed' },
-    SHIPPED: { variant: 'info', label: 'Shipped' },
-    DELIVERED: { variant: 'success', label: 'Delivered' },
-    CANCELLED: { variant: 'danger', label: 'Cancelled' },
+    RECEIVED: { variant: 'info', label: 'Order Received' },
+    ACCEPTED: { variant: 'success', label: 'Order Accepted' },
+    PACKED: { variant: 'info', label: 'Order Packed' },
+    SHIPPED: { variant: 'info', label: 'Order Shipped' },
+    DELIVERED: { variant: 'success', label: 'Order Delivered' },
+    CANCELLED: { variant: 'danger', label: 'Order Cancelled' },
   };
 
   const config = statusConfig[status];

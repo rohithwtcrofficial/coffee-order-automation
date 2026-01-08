@@ -3,15 +3,17 @@ import { onDocumentCreated, onDocumentUpdated } from 'firebase-functions/v2/fire
 import * as admin from 'firebase-admin';
 import { logger } from './utils/logger';
 import { sendEmail } from './email/sender';
+import { logEmailToFirestore } from './utils/emailLogger';
 
-import { generateOrderConfirmationEmail } from './email/templates/orderConfirmation';
-import { generateProcessingEmail } from './email/templates/processing';
+import { generateOrderReceivedEmail } from './email/templates/received';
+import { generateOrderAcceptedEmail } from './email/templates/accepted';
+import { generateOrderPackedEmail } from './email/templates/packed';
 import { generateShippedEmail } from './email/templates/shipped';
 import { generateDeliveredEmail } from './email/templates/delivered';
 import { generateCancelledEmail } from './email/templates/cancelled';
 
 /**
- * 🔐 Global options (MANDATORY for secrets)
+ * 🔐 Global options
  */
 setGlobalOptions({
   region: 'us-central1',
@@ -25,41 +27,40 @@ admin.initializeApp();
 const db = admin.firestore();
 
 /**
- * Types
+ * Normalize order status
  */
-interface OrderData {
-  customerId: string;
-  orderNumber: string;
-  status: string;
-  trackingId?: string;
-  totalAmount: number;
- items: Array<{
-  productName: string;
-  grams: number;
-  quantity: number;
-  pricePerUnit: number;
-  subtotal: number;
-  category?: string;
-  roastLevel?: string;
-  imageUrl?: string;
-}>;
-  lastEmailSentStatus?: string;
-}
+function normalizeStatus(status?: string): string | null {
+  if (!status) return null;
 
-interface CustomerData {
-  name: string;
-  email: string;
-  address: any;
+  const value = status.trim().toUpperCase();
+
+  const map: Record<string, string> = {
+    RECEIVED: 'ORDER_RECEIVED',
+    ACCEPTED: 'ORDER_ACCEPTED',
+    PACKED: 'ORDER_PACKED',
+    SHIPPED: 'ORDER_SHIPPED',
+    DELIVERED: 'ORDER_DELIVERED',
+    CANCELLED: 'ORDER_CANCELLED',
+
+    ORDER_RECEIVED: 'ORDER_RECEIVED',
+    ORDER_ACCEPTED: 'ORDER_ACCEPTED',
+    ORDER_PACKED: 'ORDER_PACKED',
+    ORDER_SHIPPED: 'ORDER_SHIPPED',
+    ORDER_DELIVERED: 'ORDER_DELIVERED',
+    ORDER_CANCELLED: 'ORDER_CANCELLED',
+  };
+
+  return map[value] || value;
 }
 
 /**
- * 🆕 Order Created → Confirmation Email
+ * 🆕 ORDER CREATED → ORDER_RECEIVED
  */
 export const onOrderCreated = onDocumentCreated(
   'orders/{orderId}',
   async (event) => {
     const orderId = event.params.orderId;
-    const order = event.data?.data() as OrderData | undefined;
+    const order = event.data?.data();
     if (!order) return;
 
     try {
@@ -68,61 +69,72 @@ export const onOrderCreated = onDocumentCreated(
         .doc(order.customerId)
         .get();
 
-      const customer = customerSnap.data() as CustomerData | undefined;
+      const customer = customerSnap.data();
       if (!customer?.email) return;
 
-      const template = generateOrderConfirmationEmail({
+      const featuredSnap = await db
+        .collection('featured_products')
+        .doc('homepage')
+        .get();
+
+      const featuredProducts =
+        featuredSnap.exists && featuredSnap.data()?.active
+          ? featuredSnap.data()?.products || []
+          : [];
+
+      const template = generateOrderReceivedEmail({
         customerName: customer.name,
         orderNumber: order.orderNumber,
         items: order.items,
         totalAmount: order.totalAmount,
-        address: customer.address,
+        address: order.deliveryAddress,
+        featuredProducts,
       });
 
       await sendEmail(customer.email, template.subject, template.html);
 
-      await db.collection('emailLogs').add({
-        orderId,
-        emailType: 'ORDER_CONFIRMATION',
-        recipientEmail: customer.email,
-        status: 'success',
-        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      await db.collection('orders').doc(orderId).update({
+        lastEmailSentStatus: 'ORDER_RECEIVED',
       });
 
-      logger.success(`Order ${orderId}: Confirmation email sent`);
+      await logEmailToFirestore({
+        orderId,
+        emailType: 'ORDER_RECEIVED',
+        recipientEmail: customer.email,
+        status: 'success',
+      });
+
+      logger.success(`Order ${orderId}: ORDER_RECEIVED email sent`);
     } catch (err) {
-      logger.error(`Order ${orderId}: Confirmation failed`, err);
+      await logEmailToFirestore({
+        orderId,
+        emailType: 'ORDER_RECEIVED',
+        recipientEmail: '',
+        status: 'failed',
+        error: err,
+      });
+
+      logger.error(`Order ${orderId}: ORDER_RECEIVED email failed`, err);
     }
   }
 );
 
 /**
- * 🔄 Order Status Updated → Status Email
+ * 🔄 ORDER STATUS UPDATED
  */
 export const onOrderStatusChange = onDocumentUpdated(
   'orders/{orderId}',
   async (event) => {
     const orderId = event.params.orderId;
+    const before = event.data?.before.data();
+    const after = event.data?.after.data();
+    if (!before || !after) return;
 
-    const beforeRaw = event.data?.before.data() as OrderData;
-    const afterRaw = event.data?.after.data() as OrderData;
-    if (!beforeRaw || !afterRaw) return;
+    const beforeStatus = normalizeStatus(before.status);
+    const afterStatus = normalizeStatus(after.status);
 
-    // ✅ NORMALIZE STATUS (THIS FIXES EVERYTHING)
-    const before: OrderData = {
-      ...beforeRaw,
-      status: beforeRaw.status?.toUpperCase(),
-    };
-
-    const after: OrderData = {
-      ...afterRaw,
-      status: afterRaw.status?.toUpperCase(),
-    };
-
-    // ✅ Safe comparison
-    if (before.status === after.status) return;
-
-    if (after.lastEmailSentStatus === after.status) return;
+    if (beforeStatus === afterStatus) return;
+    if (after.lastEmailSentStatus === afterStatus) return;
 
     try {
       const customerSnap = await db
@@ -130,46 +142,28 @@ export const onOrderStatusChange = onDocumentUpdated(
         .doc(after.customerId)
         .get();
 
-      const customer = customerSnap.data() as CustomerData | undefined;
+      const customer = customerSnap.data();
       if (!customer?.email) return;
 
-      const productNames = after.items.map(i => i.productName);
+      const productNames = after.items.map((i: any) => i.productName);
       let template;
 
-      switch (after.status) {
-        case 'PROCESSING':
-          template = generateProcessingEmail({
-            customerName: customer.name,
-            orderNumber: after.orderNumber,
-            productNames,
-          });
+      switch (afterStatus) {
+        case 'ORDER_ACCEPTED':
+          template = generateOrderAcceptedEmail({ customerName: customer.name, orderNumber: after.orderNumber, productNames });
           break;
-
-        case 'SHIPPED':
-          template = generateShippedEmail({
-            customerName: customer.name,
-            orderNumber: after.orderNumber,
-            trackingId: after.trackingId || 'Will be updated',
-            productNames,
-          });
+        case 'ORDER_PACKED':
+          template = generateOrderPackedEmail({ customerName: customer.name, orderNumber: after.orderNumber, productNames });
           break;
-
-        case 'DELIVERED':
-          template = generateDeliveredEmail({
-            customerName: customer.name,
-            orderNumber: after.orderNumber,
-            productNames,
-          });
+        case 'ORDER_SHIPPED':
+          template = generateShippedEmail({ customerName: customer.name, orderNumber: after.orderNumber, trackingId: after.trackingId || 'Will be updated', productNames });
           break;
-
-        case 'CANCELLED':
-          template = generateCancelledEmail({
-            customerName: customer.name,
-            orderNumber: after.orderNumber,
-            totalAmount: after.totalAmount,
-          });
+        case 'ORDER_DELIVERED':
+          template = generateDeliveredEmail({ customerName: customer.name, orderNumber: after.orderNumber, productNames });
           break;
-
+        case 'ORDER_CANCELLED':
+          template = generateCancelledEmail({ customerName: customer.name, orderNumber: after.orderNumber, totalAmount: after.totalAmount });
+          break;
         default:
           return;
       }
@@ -177,20 +171,27 @@ export const onOrderStatusChange = onDocumentUpdated(
       await sendEmail(customer.email, template.subject, template.html);
 
       await db.collection('orders').doc(orderId).update({
-        lastEmailSentStatus: after.status,
+        lastEmailSentStatus: afterStatus,
       });
 
-      await db.collection('emailLogs').add({
+      await logEmailToFirestore({
         orderId,
-        emailType: `STATUS_${after.status}`,
+        emailType: afterStatus!,
         recipientEmail: customer.email,
         status: 'success',
-        sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      logger.success(`Order ${orderId}: ${after.status} email sent`);
+      logger.success(`Order ${orderId}: ${afterStatus} email sent`);
     } catch (err) {
-      logger.error(`Order ${orderId}: Status email failed`, err);
+      await logEmailToFirestore({
+        orderId,
+        emailType: afterStatus || 'UNKNOWN',
+        recipientEmail: '',
+        status: 'failed',
+        error: err,
+      });
+
+      logger.error(`Order ${orderId}: ${afterStatus} email failed`, err);
     }
   }
 );

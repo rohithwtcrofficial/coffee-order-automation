@@ -1,8 +1,8 @@
 // src/lib/types/index.ts
 
 export type OrderStatus = 
-  | 'PLACED' 
-  | 'PROCESSING' 
+  | 'RECEIVED' 
+  | 'ACCEPTED' 
   | 'PACKED' 
   | 'SHIPPED' 
   | 'DELIVERED' 
@@ -75,6 +75,7 @@ export interface OrderItem {
   subtotal: number;
   category?: string;
   roastLevel?: string;
+  imageUrl?: string; // ADD THIS LINE
 }
 
 // Order

@@ -15,33 +15,36 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-  const getStatusColor = (status: string): BadgeVariant => {
-    switch (status) {
-      case 'PLACED':
-        return 'warning';
-      case 'PROCESSING':
-        return 'info';
-      case 'SHIPPED':
-        return 'info';
-      case 'DELIVERED':
-        return 'success';
-      case 'CANCELLED':
-        return 'danger';
-      default:
-        return 'default';
-    }
-  };
+ const getStatusColor = (status: string): BadgeVariant => {
+  switch (status) {
+    case 'RECEIVED':
+      return 'info';
+    case 'ACCEPTED':
+      return 'success';
+    case 'PACKED':
+      return 'info';
+    case 'SHIPPED':
+      return 'info';
+    case 'DELIVERED':
+      return 'success';
+    case 'CANCELLED':
+      return 'danger';
+    default:
+      return 'default';
+  }
+};
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'PLACED': return '📦';
-      case 'PROCESSING': return '⚙️';
-      case 'SHIPPED': return '🚚';
-      case 'DELIVERED': return '✅';
-      case 'CANCELLED': return '❌';
-      default: return '📋';
-    }
-  };
+ const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'RECEIVED': return '📥';
+    case 'ACCEPTED': return '✅';
+    case 'PACKED': return '📦';
+    case 'SHIPPED': return '🚚';
+    case 'DELIVERED': return '🎉';
+    case 'CANCELLED': return '❌';
+    default: return '📋';
+  }
+};
 
   const formatDate = (date: Date | string) => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -66,13 +69,14 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   });
 
   const statusCounts = {
-    ALL: orders.length,
-    PLACED: orders.filter(o => o.status === 'PLACED').length,
-    PROCESSING: orders.filter(o => o.status === 'PROCESSING').length,
-    SHIPPED: orders.filter(o => o.status === 'SHIPPED').length,
-    DELIVERED: orders.filter(o => o.status === 'DELIVERED').length,
-    CANCELLED: orders.filter(o => o.status === 'CANCELLED').length,
-  };
+  ALL: orders.length,
+  RECEIVED: orders.filter(o => o.status === 'RECEIVED').length,
+  ACCEPTED: orders.filter(o => o.status === 'ACCEPTED').length,
+  PACKED: orders.filter(o => o.status === 'PACKED').length,
+  SHIPPED: orders.filter(o => o.status === 'SHIPPED').length,
+  DELIVERED: orders.filter(o => o.status === 'DELIVERED').length,
+  CANCELLED: orders.filter(o => o.status === 'CANCELLED').length,
+};
 
   if (orders.length === 0) {
     return (

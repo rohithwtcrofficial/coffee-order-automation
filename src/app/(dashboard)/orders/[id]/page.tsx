@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/Badge';
 import { ArrowLeft, Package, User, MapPin, Calendar, Mail, Phone, CreditCard, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { adminDb } from '@/lib/firebase/admin';
-import { Order, Customer, BadgeVariant } from '@/lib/types/order';
+import { Order, Customer, Address, BadgeVariant } from '@/lib/types/order';
 import { StatusUpdateSection } from '@/components/orders/StatusUpdateSection';
 
 // Helper function to recursively convert Firestore Timestamps to ISO strings
@@ -62,14 +62,28 @@ async function getOrderWithCustomer(orderId: string): Promise<{ order: Order; cu
     const customerData = customerDoc.data();
     
     // Find the delivery address used for this order
-    const deliveryAddress = customerData?.addresses?.find(
-      (addr: Address) => addr.id === orderData?.deliveryAddressId
-    );
+    let deliveryAddress = orderData?.deliveryAddress;
 
-    if (!deliveryAddress) {
-      console.error('Delivery address not found');
-      return null;
-    }
+// fallback for legacy orders
+if (!deliveryAddress && orderData?.deliveryAddressId) {
+  deliveryAddress = customerData?.addresses?.find(
+    (addr: Address) => addr.id === orderData.deliveryAddressId
+  );
+}
+
+// FINAL fallback (never crash UI)
+if (!deliveryAddress) {
+  deliveryAddress = {
+    street: 'Address unavailable',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: '',
+    label: 'Deleted',
+    isDefault: false,
+  };
+}
+
 
     return {
       order: serializeFirestoreData({
@@ -102,27 +116,29 @@ export default async function OrderDetailPage({
 
   const { order, customer, deliveryAddress } = data;
 
-  const getStatusColor = (status: string): BadgeVariant => {
-    switch (status) {
-      case 'PLACED': return 'warning';
-      case 'PROCESSING': return 'info';
-      case 'SHIPPED': return 'info';
-      case 'DELIVERED': return 'success';
-      case 'CANCELLED': return 'danger';
-      default: return 'default';
-    }
-  };
+ const getStatusColor = (status: string): BadgeVariant => {
+  switch (status) {
+    case 'RECEIVED': return 'info';
+    case 'ACCEPTED': return 'success';
+    case 'PACKED': return 'info';
+    case 'SHIPPED': return 'info';
+    case 'DELIVERED': return 'success';
+    case 'CANCELLED': return 'danger';
+    default: return 'default';
+  }
+};
 
   const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'PLACED': return '📦';
-      case 'PROCESSING': return '⚙️';
-      case 'SHIPPED': return '🚚';
-      case 'DELIVERED': return '✅';
-      case 'CANCELLED': return '❌';
-      default: return '📋';
-    }
-  };
+  switch (status) {
+    case 'RECEIVED': return '📥';
+    case 'ACCEPTED': return '✅';
+    case 'PACKED': return '📦';
+    case 'SHIPPED': return '🚚';
+    case 'DELIVERED': return '🎉';
+    case 'CANCELLED': return '❌';
+    default: return '📋';
+  }
+};
 
   const formatDate = (date: Date | string) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
@@ -136,11 +152,12 @@ export default async function OrderDetailPage({
   };
 
   const statusTimeline = [
-    { status: 'PLACED', label: 'Order Placed', active: true },
-    { status: 'PROCESSING', label: 'Processing', active: ['PROCESSING', 'SHIPPED', 'DELIVERED'].includes(order.status) },
-    { status: 'SHIPPED', label: 'Shipped', active: ['SHIPPED', 'DELIVERED'].includes(order.status) },
-    { status: 'DELIVERED', label: 'Delivered', active: order.status === 'DELIVERED' },
-  ];
+  { status: 'RECEIVED', label: 'Received', active: true },
+  { status: 'ACCEPTED', label: 'Accepted', active: ['ACCEPTED', 'PACKED', 'SHIPPED', 'DELIVERED'].includes(order.status) },
+  { status: 'PACKED', label: 'Packed', active: ['PACKED', 'SHIPPED', 'DELIVERED'].includes(order.status) },
+  { status: 'SHIPPED', label: 'Shipped', active: ['SHIPPED', 'DELIVERED'].includes(order.status) },
+  { status: 'DELIVERED', label: 'Delivered', active: order.status === 'DELIVERED' },
+];
 
   return (
     <div className="space-y-6 pb-8">

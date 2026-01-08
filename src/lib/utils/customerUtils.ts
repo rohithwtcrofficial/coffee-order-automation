@@ -128,7 +128,7 @@ export async function findOrCreateCustomer(
 }
 
 /**
- * Updates customer stats after order is placed
+ * Updates customer stats after order is RECEIVED
  */
 export async function updateCustomerStats(
   customerId: string,
