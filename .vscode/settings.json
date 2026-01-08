@@ -29,5 +29,10 @@
   "tailwindCSS.lint.invalidVariant": "ignore",
   "tailwindCSS.lint.invalidTailwindDirective": "ignore",
   "tailwindCSS.lint.recommendedVariantOrder": "ignore",
-  "tailwindCSS.lint.candidateClass": "ignore"
+  "tailwindCSS.lint.candidateClass": "ignore",
+
+  // Add these lines to fix CSS warnings
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "less.lint.unknownAtRules": "ignore"
 }
