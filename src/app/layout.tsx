@@ -8,7 +8,7 @@ import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Coffee Admin - Order Management',
+  title: 'Western Terrain Coffee Roasters - Order Management',
   description: 'Internal admin system for coffee order management',
 };
 

@@ -33,7 +33,7 @@ interface OrderItem {
   quantity: number;
   pricePerUnit: number;
   subtotal: number;
-  imageUrl?: string;
+  // imageUrl?: string;
 }
 
 interface CustomerInfo {
@@ -106,7 +106,7 @@ export default function NewOrderPage() {
       quantity: 1, 
       pricePerUnit: 0, 
       subtotal: 0,
-      imageUrl: '' 
+      // imageUrl: '' 
     }
   ]);
 
@@ -269,7 +269,7 @@ export default function NewOrderPage() {
       quantity: 1, 
       pricePerUnit: 0, 
       subtotal: 0,
-      imageUrl: ''
+      // imageUrl: ''
     }]);
   };
 
@@ -295,7 +295,7 @@ export default function NewOrderPage() {
       grams: firstGram,
       pricePerUnit: product.pricePerVariant[firstGram],
       subtotal: newItems[index].quantity * product.pricePerVariant[firstGram],
-      imageUrl: product.imageUrl || '',
+      // imageUrl: product.imageUrl || '',
     };
     
     setItems(newItems);
@@ -464,7 +464,7 @@ export default function NewOrderPage() {
     quantity: item.quantity,
     pricePerUnit: item.pricePerUnit,
     subtotal: item.subtotal,
-    imageUrl: item.imageUrl,
+    // imageUrl: item.imageUrl,
   })),
 
   totalAmount,

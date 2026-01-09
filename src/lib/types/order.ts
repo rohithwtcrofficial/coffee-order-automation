@@ -32,7 +32,7 @@ export interface OrderItem {
   quantity: number;
   pricePerUnit: number;
   subtotal: number;
-  imageUrl?: string;
+  // imageUrl?: string;
 }
 
 export interface Order {

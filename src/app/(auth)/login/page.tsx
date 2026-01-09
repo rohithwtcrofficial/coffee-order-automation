@@ -2,7 +2,7 @@
 import { LoginForm } from '@/components/auth/LoginForm';
 
 export const metadata = {
-  title: 'Login - Coffee Admin',
+  title: 'Login - Western Terrain Coffee Roasters',
   description: 'Sign in to access the admin dashboard',
 };
 

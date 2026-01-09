@@ -5,7 +5,7 @@ import { useState, useMemo } from 'react';
 import { Card } from '@/components/ui/Card';
 import { 
   ShoppingCart, Package, Users, TrendingUp, Search, 
-  Calendar, DollarSign, Activity, ArrowUpRight, ArrowDownRight,
+  Calendar, IndianRupee, Activity, ArrowUpRight, ArrowDownRight,
   Clock, Star, Box, AlertCircle, CheckCircle, XCircle,
   BarChart3, PieChart, RefreshCw, Download, Eye,
   Coffee, Award, Target, Zap, ChevronRight
@@ -16,7 +16,7 @@ import {
   Tooltip, ResponsiveContainer 
 } from 'recharts';
 import type { Order, Customer, Product } from '@/lib/types';
-import { formatCurrency } from '@/lib/utils/formatters';
+import { formatCurrency, formatDate } from '@/lib/utils/formatters';
 import Link from 'next/link';
 
 interface DashboardClientProps {
@@ -281,7 +281,7 @@ export default function DashboardClient({ orders, customers, products }: Dashboa
             <div className="relative p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="p-3 bg-green-100 rounded-xl">
-                  <DollarSign className="w-6 h-6 text-green-600" />
+                  <IndianRupee className="w-6 h-6 text-green-600" />
                 </div>
                 {stats.revenueGrowth !== 0 && (
                   <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold ${stats.revenueGrowth > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
@@ -691,7 +691,7 @@ export default function DashboardClient({ orders, customers, products }: Dashboa
                           <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusColor(order.status)}`}>
                             {order.status}
                           </span>
-                          <span className="text-xs text-gray-500">{orderDate.toLocaleDateString()}</span>
+                          <span className="text-xs text-gray-500">{formatDate(orderDate)}</span>
                         </div>
                       </div>
                       <div className="text-right">

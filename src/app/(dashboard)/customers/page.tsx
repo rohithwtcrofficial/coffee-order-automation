@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { 
   Eye, Mail, Phone, MapPin, Search, RefreshCw, Users, 
-  TrendingUp, DollarSign, ShoppingBag, Download, Filter,
+  TrendingUp, IndianRupee, ShoppingBag, Download, Filter,
   Star, Award, UserPlus
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -202,7 +202,7 @@ export default function CustomersPage() {
                 </div>
                 <div className="bg-linear-to-r from-green-50 to-green-100 rounded-xl p-4 border border-green-200">
                   <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-4 h-4 text-green-600" />
+                    <IndianRupee className="w-4 h-4 text-green-600" />
                     <p className="text-xs text-green-700 font-semibold uppercase">Total Revenue</p>
                   </div>
                   <p className="text-2xl font-bold text-green-900">{formatCurrency(stats.totalRevenue)}</p>

@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { Badge } from '@/components/ui/Badge';
 import { Order, BadgeVariant } from '@/lib/types/order';
-import { Eye, Package, Calendar, DollarSign, Search, Filter } from 'lucide-react';
+import { Eye, Package, Calendar, IndianRupee, Search, Filter } from 'lucide-react';
 import Link from 'next/link';
 
 interface OrdersTableProps {
@@ -111,7 +111,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     
     <div className="bg-linear-to-br from-green-50 to-green-100 p-4 rounded-lg">
       <div className="flex items-center gap-2 text-green-600 mb-1">
-        <DollarSign className="w-4 h-4" />
+        <IndianRupee className="w-4 h-4" />
         <span className="text-sm font-medium">Total Revenue</span>
       </div>
       <div className="text-2xl font-bold text-green-900">
@@ -133,7 +133,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
     
     <div className="bg-linear-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
       <div className="flex items-center gap-2 text-orange-600 mb-1">
-        <DollarSign className="w-4 h-4" />
+        <IndianRupee className="w-4 h-4" />
         <span className="text-sm font-medium">Avg Order Value</span>
       </div>
       <div className="text-2xl font-bold text-orange-900">
