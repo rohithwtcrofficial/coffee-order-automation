@@ -32,6 +32,18 @@ const roastLevelOptions = [
   { value: 'DARK', label: 'Dark' },
 ];
 
+interface DescriptionPoint {
+  label: string;
+  value: string;
+}
+
+interface DescriptionSection {
+  id: string;
+  title: string;
+  points: DescriptionPoint[];
+}
+
+
 interface Variant {
   grams: number;
   price: number;
@@ -44,9 +56,12 @@ export default function NewProductPage() {
 
   // Product Information
   const [name, setName] = useState('');
-  const [category, setCategory] = useState('COFFEE_BEANS');
+  const [category, setCategory] = useState('Coffee Beans');
   const [roastLevel, setRoastLevel] = useState('MEDIUM');
-  const [description, setDescription] = useState('');
+  const [descriptionSections, setDescriptionSections] = useState<DescriptionSection[]>([]);
+  const [sectionTitle, setSectionTitle] = useState('');
+  const [pointLabel, setPointLabel] = useState('');
+  const [pointValue, setPointValue] = useState('');
   const [origin, setOrigin] = useState('');
   const [stockQuantity, setStockQuantity] = useState(0);
   const [isActive, setIsActive] = useState(true);
@@ -67,6 +82,66 @@ export default function NewProductPage() {
   // Tasting Notes
   const [tastingNotes, setTastingNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
+
+  const addSection = () => {
+  if (!sectionTitle.trim()) return;
+
+  setDescriptionSections(prev => [
+    ...prev,
+    {
+      id: crypto.randomUUID(),
+      title: sectionTitle.trim(),
+      points: [],
+    },
+  ]);
+
+  setSectionTitle('');
+};
+
+
+const removeSection = (id: string) => {
+  setDescriptionSections(prev => prev.filter(s => s.id !== id));
+};
+
+const addPointToSection = (sectionId: string) => {
+  if (!pointLabel.trim() || !pointValue.trim()) return;
+
+  setDescriptionSections(prev =>
+    prev.map(section =>
+      section.id === sectionId
+        ? {
+            ...section,
+            points: [
+              ...section.points,
+              {
+                label: pointLabel.trim(),
+                value: pointValue.trim(),
+              },
+            ],
+          }
+        : section
+    )
+  );
+
+  setPointLabel('');
+  setPointValue('');
+};
+
+
+const removePoint = (sectionId: string, index: number) => {
+  setDescriptionSections(prev =>
+    prev.map(section =>
+      section.id === sectionId
+        ? {
+            ...section,
+            points: section.points.filter((_, i) => i !== index),
+          }
+        : section
+    )
+  );
+};
+
+
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -182,7 +257,7 @@ export default function NewProductPage() {
         name,
         category,
         roastLevel,
-        description,
+        descriptionSections:descriptionSections.length > 0 ? descriptionSections : null,
         origin: origin || null,
         availableGrams: availableGrams.sort((a, b) => a - b),
         pricePerVariant,
@@ -262,7 +337,7 @@ export default function NewProductPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-amber-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
@@ -273,7 +348,7 @@ export default function NewProductPage() {
             >
               <ArrowLeft className="w-5 h-5 text-gray-600" />
             </Link>
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -304,7 +379,7 @@ export default function NewProductPage() {
                 }}
                 className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
                   imageInputMode === 'upload'
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg'
+                    ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white shadow-lg'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
@@ -318,7 +393,7 @@ export default function NewProductPage() {
                 }}
                 className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${
                   imageInputMode === 'url'
-                    ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-lg'
+                    ? 'bg-linear-to-r from-amber-600 to-orange-600 text-white shadow-lg'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }`}
               >
@@ -340,6 +415,8 @@ export default function NewProductPage() {
                     onClick={removeImage}
                     variant="ghost"
                     size="sm"
+                    aria-label="Remove image"
+                    title="Remove image"
                     className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm shadow-md hover:bg-red-50 border border-gray-200 p-1.5"
                   >
                     <X className="w-3.5 h-3.5 text-red-600" />
@@ -428,7 +505,7 @@ export default function NewProductPage() {
                         type="button"
                         onClick={loadImageFromUrl}
                         disabled={!imageUrlInput.trim()}
-                        className="mt-3 w-full px-4 py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-xl hover:from-amber-700 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold shadow-lg text-sm"
+                        className="mt-3 w-full px-4 py-2.5 bg-linear-to-r from-amber-600 to-orange-600 text-white rounded-xl hover:from-amber-700 hover:to-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold shadow-lg text-sm"
                       >
                         Load Image
                       </button>
@@ -509,13 +586,102 @@ export default function NewProductPage() {
               <label className="block text-sm font-bold text-gray-900 mb-2">
                 Description
               </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                placeholder="Describe the flavor profile, brewing recommendations, etc."
-              />
+              <div className="mt-6">
+  <label className="block text-sm font-bold text-gray-900 mb-2">
+    Product Description (Structured)
+  </label>
+
+  {/* Add section */}
+  <div className="flex gap-2 mb-4">
+    <Input
+      value={sectionTitle}
+      onChange={(e) => setSectionTitle(e.target.value)}
+      placeholder="Section title (e.g. Why you’ll love it)"
+      className="border-2"
+    />
+    <Button
+      type="button"
+      onClick={addSection}
+      aria-label="Add section"
+      title="Add section"
+      className="bg-linear-to-r from-amber-600 to-orange-600"
+    >
+      <Plus className="w-4 h-4" />
+    </Button>
+  </div>
+
+  {/* Sections */}
+  <div className="space-y-4">
+    {descriptionSections.map(section => (
+      <div
+        key={section.id}
+        className="p-4 bg-linear-to-br from-gray-50 to-amber-50 rounded-xl border-2 border-gray-200"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-bold text-gray-900">{section.title}</h4>
+          <button
+            type="button"
+            aria-label="Remove section"
+            title="Remove section"
+            onClick={() => removeSection(section.id)}
+            className="text-red-600 hover:text-red-700"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Add point */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+            <Input
+              value={pointLabel}
+              onChange={(e) => setPointLabel(e.target.value)}
+              placeholder="Label (e.g. Bean, Roast, Body)"
+              className="border-2"
+            />
+            <Input
+              value={pointValue}
+              onChange={(e) => setPointValue(e.target.value)}
+              placeholder="Value (e.g. 100% Arabica, Medium)"
+              className="border-2"
+            />
+          </div>
+
+          <Button
+            type="button"
+            onClick={() => addPointToSection(section.id)}
+            className="bg-amber-500"
+          >
+            <Plus className="w-4 h-4" />
+        </Button>
+
+
+        {/* Points */}
+        <ul className="space-y-1">
+  {section.points.map((point, index) => (
+    <li
+      key={index}
+      className="flex justify-between items-start gap-2"
+    >
+      <div>
+        <span className="font-semibold">{point.label}:</span>{' '}
+        <span>{point.value}</span>
+      </div>
+      <button
+        type="button"
+        onClick={() => removePoint(section.id, index)}
+        aria-label="Remove item"
+        title="Remove item"
+        className="text-red-500"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    </li>
+  ))}
+</ul>
+      </div>
+    ))}
+  </div>
+</div>
             </div>
           </Card>
 
@@ -526,7 +692,7 @@ export default function NewProductPage() {
                 <IndianRupee className="w-5 h-5 text-amber-600" />
                 <h2 className="text-lg font-bold text-gray-900">Sizes & Pricing *</h2>
               </div>
-              <Button type="button" onClick={addVariant} className="bg-gradient-to-r from-amber-600 to-orange-600 shadow-lg">
+              <Button type="button" onClick={addVariant} className="bg-linear-to-r from-amber-600 to-orange-600 shadow-lg">
                 <Plus className="w-4 h-4 mr-1" />
                 Add Size
               </Button>
@@ -534,7 +700,7 @@ export default function NewProductPage() {
 
             <div className="space-y-3">
               {variants.map((variant, index) => (
-                <div key={index} className="flex items-end gap-3 p-4 bg-gradient-to-br from-gray-50 to-amber-50 rounded-xl border-2 border-gray-200">
+                <div key={index} className="flex items-end gap-3 p-4 bg-linear-to-br from-gray-50 to-amber-50 rounded-xl border-2 border-gray-200">
                   <Input
                     label="Grams"
                     type="number"
@@ -597,7 +763,7 @@ export default function NewProductPage() {
               <Button 
                 type="button" 
                 onClick={addTastingNote}
-                className="bg-gradient-to-r from-amber-600 to-orange-600 shadow-lg"
+                className="bg-linear-to-r from-amber-600 to-orange-600 shadow-lg"
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -608,12 +774,14 @@ export default function NewProductPage() {
                 {tastingNotes.map((note) => (
                   <span
                     key={note}
-                    className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-900 rounded-xl text-sm font-bold border-2 border-amber-200"
+                    className="inline-flex items-center px-4 py-2 bg-linear-to-r from-amber-100 to-orange-100 text-amber-900 rounded-xl text-sm font-bold border-2 border-amber-200"
                   >
                     {note}
                     <button
                       type="button"
                       onClick={() => removeTastingNote(note)}
+                      aria-label="Remove tasting note"
+                       title="Remove tasting note"
                       className="ml-2 hover:text-red-600 transition-colors"
                     >
                       <X className="w-4 h-4" />
@@ -642,7 +810,7 @@ export default function NewProductPage() {
             <button
               onClick={handleSubmit}
               disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
-              className="w-40 px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center gap-2 text-sm"
+              className="w-40 px-5 py-2.5 bg-linear-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center gap-2 text-sm"
             >
               {uploadingImage ? (
                 <>

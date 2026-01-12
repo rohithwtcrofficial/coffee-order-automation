@@ -11,7 +11,6 @@ import {
   X,
   ShoppingBag,
   Package,
-  Settings,
   Coffee,
   ChevronDown,
   Mail,
@@ -26,6 +25,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { Order, Customer, Product } from '@/lib/types';
 import { formatCurrency } from '@/lib/utils/formatters';
+import { useAuth } from '@/lib/contexts/AuthContext';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -48,6 +48,9 @@ interface AdminData {
   name: string;
   email: string;
   role: string;
+  photoURL?: string;
+  phone?: string;
+  department?: string;
   createdAt?: any;
 }
 
@@ -70,6 +73,7 @@ const auth = getAuth(app);
 
 export function Header({ orders = [], customers = [], products = [] }: HeaderProps) {
   const router = useRouter();
+  const { signOut: authSignOut, admin: authAdmin, user } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -77,7 +81,7 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [admin, setAdmin] = useState<AdminData | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
   
   // Local state for when props aren't provided
   const [localOrders, setLocalOrders] = useState<Order[]>([]);
@@ -89,109 +93,22 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
   const effectiveCustomers = customers.length > 0 ? customers : localCustomers;
   const effectiveProducts = products.length > 0 ? products : localProducts;
 
-  // Fetch admin data from Firebase
-  useEffect(() => {
-    const fetchAdminData = async () => {
-      const currentUser = auth.currentUser;
-      if (!currentUser) {
-        // If no user is logged in, use default admin
-        setAdmin({
-          id: 'aICifQbRVMPZAR79S6ldzZWePjk2',
-          name: 'WTCR',
-          email: 'hr@westernterraincoffee.com',
-          role: 'admin'
-        });
-        return;
-      }
-
-      try {
-        // Query the admins collection for the current user
-        const adminsQuery = query(
-          collection(db, 'admins'),
-          where('email', '==', currentUser.email),
-          limit(1)
-        );
-        
-        const adminsSnapshot = await getDocs(adminsQuery);
-        
-        if (!adminsSnapshot.empty) {
-          const adminDoc = adminsSnapshot.docs[0];
-          setAdmin({
-            id: adminDoc.id,
-            ...adminDoc.data()
-          } as AdminData);
-        } else {
-          // Fallback to default admin if not found
-          setAdmin({
-            id: 'aICifQbRVMPZAR79S6ldzZWePjk2',
-            name: 'WTCR',
-            email: 'hr@westernterraincoffee.com',
-            role: 'admin'
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching admin data:', error);
-        // Fallback to default admin
-        setAdmin({
-          id: 'aICifQbRVMPZAR79S6ldzZWePjk2',
-          name: 'WTCR',
-          email: 'hr@westernterraincoffee.com',
-          role: 'admin'
-        });
-      }
-    };
-
-    fetchAdminData();
-
-    // Listen for auth state changes
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        fetchAdminData();
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  // Fetch data only if props aren't provided
-  useEffect(() => {
-    if (orders.length === 0 || customers.length === 0 || products.length === 0) {
-      const fetchData = async () => {
-        try {
-          if (orders.length === 0) {
-            const ordersSnapshot = await getDocs(collection(db, 'orders'));
-            const ordersData = ordersSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            })) as Order[];
-            setLocalOrders(ordersData);
-          }
-
-          if (customers.length === 0) {
-            const customersSnapshot = await getDocs(collection(db, 'customers'));
-            const customersData = customersSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            })) as Customer[];
-            setLocalCustomers(customersData);
-          }
-
-          if (products.length === 0) {
-            const productsSnapshot = await getDocs(collection(db, 'products'));
-            const productsData = productsSnapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data()
-            })) as Product[];
-            setLocalProducts(productsData);
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
+  // Use admin from AuthContext directly instead of duplicating state
+  const admin = useMemo(() => {
+    if (authAdmin) {
+      return {
+        id: authAdmin.id,
+        name: authAdmin.name,
+        email: authAdmin.email,
+        role: authAdmin.role,
+        photoURL: (authAdmin as any).photoURL,
+        phone: (authAdmin as any).phone,
+        department: (authAdmin as any).department,
+        createdAt: authAdmin.createdAt,
       };
-
-      fetchData();
     }
-  }, [orders.length, customers.length, products.length]);
+    return null;
+  }, [authAdmin]);
 
   // Calculate stats from effective data
   const stats = useMemo(() => {
@@ -251,8 +168,64 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
     return labels[type] || type;
   };
 
-  // Real-time listener for email logs
+  // Fetch data from Firebase if not provided via props
   useEffect(() => {
+    // Don't fetch if signing out or not authenticated
+    if (isSigningOut || !auth.currentUser) {
+      return;
+    }
+    
+    if (orders.length === 0 || customers.length === 0 || products.length === 0) {
+      const fetchData = async () => {
+        try {
+          // Double-check authentication before fetching
+          if (isSigningOut || !auth.currentUser) return;
+          
+          if (orders.length === 0) {
+            const ordersSnapshot = await getDocs(collection(db, 'orders'));
+            const ordersData = ordersSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            })) as Order[];
+            if (!isSigningOut) setLocalOrders(ordersData);
+          }
+
+          if (customers.length === 0) {
+            const customersSnapshot = await getDocs(collection(db, 'customers'));
+            const customersData = customersSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            })) as Customer[];
+            if (!isSigningOut) setLocalCustomers(customersData);
+          }
+
+          if (products.length === 0) {
+            const productsSnapshot = await getDocs(collection(db, 'products'));
+            const productsData = productsSnapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data()
+            })) as Product[];
+            if (!isSigningOut) setLocalProducts(productsData);
+          }
+        } catch (error: any) {
+          // Only log error if not signing out and not a permission error
+          if (!isSigningOut && error?.code !== 'permission-denied') {
+            console.error('Error fetching data:', error);
+          }
+        }
+      };
+
+      fetchData();
+    }
+  }, [orders.length, customers.length, products.length, isSigningOut]);
+
+  // Listen to notifications
+  useEffect(() => {
+    // Don't set up listener if signing out or not authenticated
+    if (isSigningOut || !auth.currentUser) {
+      return;
+    }
+
     const q = query(
       collection(db, 'emailLogs'),
       orderBy('sentAt', 'desc'),
@@ -260,10 +233,12 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
+      // Check if signing out before processing
+      if (isSigningOut) return;
+      
       const emailNotifications = snapshot.docs.map((doc) => {
         const data = doc.data();
-        // Explicitly check: unread if read field is missing or explicitly false
-        const isUnread = !data.read; // This will be true if read is undefined, null, or false
+        const isUnread = !data.read;
         
         return {
           id: doc.id,
@@ -278,12 +253,15 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
         };
       });
       setNotifications(emailNotifications);
-    }, (error) => {
-      console.error('Error listening to notifications:', error);
+    }, (error: any) => {
+      // Only log error if not signing out
+      if (!isSigningOut) {
+        console.error('Error listening to notifications:', error);
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isSigningOut]);
 
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
@@ -316,18 +294,12 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
 
   // Handle notification click
   const handleNotificationClick = async (notification: NotificationData) => {
-    // Mark as read first
     await markAsRead(notification.id);
-    
-    // Close notifications dropdown
     setShowNotifications(false);
     
-    // Navigate to relevant page based on notification type
     if (notification.orderId) {
-      // Navigate to specific order
       router.push(`/orders/${notification.orderId}`);
     } else {
-      // For non-order notifications, navigate to appropriate page
       switch (notification.type) {
         case 'WELCOME':
           router.push('/customers');
@@ -413,10 +385,28 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
 
   const handleSignOut = async () => {
     try {
-      await auth.signOut();
-      router.push('/login');
+      // Set signing out state to prevent data fetching
+      setIsSigningOut(true);
+      
+      // Close menus
+      setShowUserMenu(false);
+      setShowNotifications(false);
+      setShowMobileMenu(false);
+      
+      // Clear local state
+      setNotifications([]);
+      setLocalOrders([]);
+      setLocalCustomers([]);
+      setLocalProducts([]);
+      setSearchQuery('');
+      setSearchResults([]);
+      
+      // Use the AuthContext signOut method
+      await authSignOut();
     } catch (error) {
       console.error('Error signing out:', error);
+      // Force redirect even on error
+      window.location.replace('/login');
     }
   };
 
@@ -435,8 +425,31 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-amber-600 to-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Coffee className="text-white" size={24} />
+              <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden shadow-lg bg-white">
+                <img 
+                  src="/logo.png" 
+                  alt="Western Terrain Coffee Roasters Logo" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    const parent = e.currentTarget.parentElement;
+                    if (parent) {
+                      parent.className = 'w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center shadow-lg';
+                      const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                      icon.setAttribute('class', 'text-white');
+                      icon.setAttribute('width', '24');
+                      icon.setAttribute('height', '24');
+                      icon.setAttribute('viewBox', '0 0 24 24');
+                      icon.setAttribute('fill', 'none');
+                      icon.setAttribute('stroke', 'currentColor');
+                      icon.setAttribute('stroke-width', '2');
+                      icon.setAttribute('stroke-linecap', 'round');
+                      icon.setAttribute('stroke-linejoin', 'round');
+                      icon.innerHTML = '<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>';
+                      parent.appendChild(icon);
+                    }
+                  }}
+                />
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-amber-900 to-orange-800 bg-clip-text text-transparent">
@@ -464,41 +477,40 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
                 {showMobileMenu ? <X size={24} /> : <Menu size={24} />}
               </button>
               
-              <Link href="/" className="flex items-center gap-3">
-  <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden shadow-lg bg-white">
-    <img 
-      src="/logo.png" 
-      alt="Western Terrain Coffee Roasters Logo" 
-      className="w-full h-full object-cover"
-      onError={(e) => {
-        // Fallback to gradient with Coffee icon if logo fails to load
-        e.currentTarget.style.display = 'none';
-        const parent = e.currentTarget.parentElement;
-        if (parent) {
-          parent.className = 'w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center shadow-lg';
-          const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-          icon.setAttribute('class', 'text-white');
-          icon.setAttribute('width', '24');
-          icon.setAttribute('height', '24');
-          icon.setAttribute('viewBox', '0 0 24 24');
-          icon.setAttribute('fill', 'none');
-          icon.setAttribute('stroke', 'currentColor');
-          icon.setAttribute('stroke-width', '2');
-          icon.setAttribute('stroke-linecap', 'round');
-          icon.setAttribute('stroke-linejoin', 'round');
-          icon.innerHTML = '<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>';
-          parent.appendChild(icon);
-        }
-      }}
-    />
-  </div>
-  <div className="hidden sm:block">
-    <h1 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-amber-900 to-orange-800 bg-clip-text text-transparent">
-      Western Terrain Coffee Roasters
-    </h1>
-    <p className="text-xs sm:text-sm text-gray-600">Dashboard & Management</p>
-  </div>
-</Link>
+              <Link href="/dashboard" className="flex items-center gap-3">
+                <div className="relative w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden shadow-lg bg-white">
+                  <img 
+                    src="/logo.png" 
+                    alt="Western Terrain Coffee Roasters Logo" 
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      const parent = e.currentTarget.parentElement;
+                      if (parent) {
+                        parent.className = 'w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center shadow-lg';
+                        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                        icon.setAttribute('class', 'text-white');
+                        icon.setAttribute('width', '24');
+                        icon.setAttribute('height', '24');
+                        icon.setAttribute('viewBox', '0 0 24 24');
+                        icon.setAttribute('fill', 'none');
+                        icon.setAttribute('stroke', 'currentColor');
+                        icon.setAttribute('stroke-width', '2');
+                        icon.setAttribute('stroke-linecap', 'round');
+                        icon.setAttribute('stroke-linejoin', 'round');
+                        icon.innerHTML = '<path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>';
+                        parent.appendChild(icon);
+                      }
+                    }}
+                  />
+                </div>
+                <div className="hidden sm:block">
+                  <h1 className="text-xl sm:text-2xl font-bold bg-linear-to-r from-amber-900 to-orange-800 bg-clip-text text-transparent">
+                    Western Terrain Coffee Roasters
+                  </h1>
+                  <p className="text-xs sm:text-sm text-gray-600">Dashboard & Management</p>
+                </div>
+              </Link>
             </div>
 
             <div className="hidden md:flex flex-1 max-w-xl mx-8">
@@ -655,46 +667,60 @@ export function Header({ orders = [], customers = [], products = [] }: HeaderPro
                   </div>
                 )}
               </div>
-
+              
               <div className="relative">
                 <button
                   onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-3 pr-1 sm:pr-2 py-1.5 sm:py-2 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 rounded-xl transition-all shadow-md hover:shadow-lg"
+                  className="p-1 rounded-full hover:ring-2 hover:ring-amber-400 transition-all"
                 >
-                  <div className="hidden sm:block text-right">
-                    <div className="text-xs sm:text-sm font-medium text-white">{admin.name}</div>
-                    <div className="text-xs text-amber-100 capitalize">{admin.role}</div>
-                  </div>
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white rounded-lg flex items-center justify-center shadow-inner">
-                    <span className="text-sm sm:text-base font-bold bg-linear-to-br from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                      {getAdminInitials(admin.name)}
-                    </span>
-                  </div>
-                  <ChevronDown size={16} className="text-white hidden sm:block" />
+                  {admin.photoURL ? (
+                    <img
+                      src={admin.photoURL}
+                      alt={admin.name}
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover shadow-md border-2 border-white"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center shadow-md border-2 border-white">
+                      <span className="text-sm sm:text-base font-bold text-white">
+                        {getAdminInitials(admin.name)}
+                      </span>
+                    </div>
+                  )}
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50">
-                    <div className="p-4 bg-linear-to-r from-amber-50 to-orange-50 border-b border-gray-100">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center shadow-md">
-                          <span className="text-lg font-bold text-white">{getAdminInitials(admin.name)}</span>
-                        </div>
-                        <div>
-                          <div className="font-semibold text-gray-900">{admin.name}</div>
-                          <div className="text-sm text-gray-600">{admin.email}</div>
-                        </div>
+                  <div className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50">
+                    <div className="p-6 bg-linear-to-r from-amber-50 to-orange-50 border-b border-gray-100">
+                      <div className="flex flex-col items-center text-center">
+                        {admin.photoURL ? (
+                          <img
+                            src={admin.photoURL}
+                            alt={admin.name}
+                            className="w-20 h-20 rounded-full object-cover border-4 border-amber-500 shadow-lg mb-3"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 bg-linear-to-br from-amber-500 to-orange-500 rounded-full flex items-center justify-center shadow-lg border-4 border-white mb-3">
+                            <span className="text-2xl font-bold text-white">{getAdminInitials(admin.name)}</span>
+                          </div>
+                        )}
+                        <h3 className="font-bold text-gray-900 text-lg">{admin.name}</h3>
+                        <p className="text-sm text-gray-600 mt-1">{admin.email}</p>
+                        {admin.role && (
+                          <span className="mt-2 px-3 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full capitalize">
+                            {admin.role.replace('_', ' ')}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="p-2">
-                      <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors text-left">
+                      <Link
+                        href="/profile"
+                        className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                        onClick={() => setShowUserMenu(false)}
+                      >
                         <User size={18} className="text-gray-600" />
                         <span className="text-sm text-gray-700">My Profile</span>
-                      </button>
-                      <button className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors text-left">
-                        <Settings size={18} className="text-gray-600" />
-                        <span className="text-sm text-gray-700">Settings</span>
-                      </button>
+                      </Link>
                       <div className="my-2 border-t border-gray-100"></div>
                       <button
                         onClick={handleSignOut}

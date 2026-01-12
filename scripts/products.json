@@ -1,0 +1,284 @@
+[
+  {
+    "name": "Dark Roast Single Origin Coffee Beans – Perfect for a Rich Cup",
+    "category": "COFFEE_BEANS",
+    "roastLevel": "DARK",
+    "origin": "Coorg and Chikmagalur",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 120,
+    "availableGrams": [250],
+    "pricePerVariant": { "250": 495 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/92d18ca9-10e3-4f96-a1af-e53160564568.png",
+    "tastingNotes": [
+      "Full-bodied dark roast with chocolate, caramel, subtle smokiness, and a long cocoa-like finish."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Product Details",
+        "points": [
+          { "label": "Overview", "value": "Deep, intense flavors from carefully roasted single-origin beans, perfect black or with milk." }
+        ]
+      },
+      {
+        "title": "Why You’ll Love It",
+        "points": [
+          { "label": "Single Origin", "value": "Authentic terroir-driven character." },
+          { "label": "Dark Roast Depth", "value": "Chocolate, caramel, and smoky notes." },
+          { "label": "Freshly Roasted", "value": "Small-batch roasted for peak aroma." },
+          { "label": "Eco Conscious", "value": "Sustainable, planet-friendly packaging." }
+        ]
+      },
+      {
+        "title": "How to Brew",
+        "points": [
+          { "label": "French Press", "value": "1:16 ratio, coarse grind, 4 minutes steep." },
+          { "label": "Espresso", "value": "1:2 ratio in 25–30 seconds." },
+          { "label": "Pour Over", "value": "1:16–1:17 ratio, medium-coarse grind." }
+        ]
+      },
+      {
+        "title": "Taste Profile",
+        "points": [
+          { "label": "Body", "value": "Full, rounded" },
+          { "label": "Acidity", "value": "Low and smooth" },
+          { "label": "Notes", "value": "Dark chocolate, caramel, subtle smoke" },
+          { "label": "Finish", "value": "Long, cocoa-like" }
+        ]
+      },
+      {
+        "title": "Key Details",
+        "points": [
+          { "label": "Bean", "value": "100% Arabica, single origin" },
+          { "label": "Roast", "value": "Dark" },
+          { "label": "Process", "value": "Washed or natural (lot dependent)" },
+          { "label": "Storage", "value": "Airtight, cool, dry, away from light" }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Traditional Medium Dark Roast Single Origin Coffee – 100% Arabica",
+    "category": "COFFEE_BEANS",
+    "roastLevel": "MEDIUM_DARK",
+    "origin": "Coorg and Chikmagalur",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 90,
+    "availableGrams": [250],
+    "pricePerVariant": { "250": 485 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/26c634ca-f123-4a36-a156-2191862fe728.png",
+    "tastingNotes": [
+      "Bold cup with cocoa, toasted nuts, caramel hints, and gentle bitterness."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Product Details",
+        "points": [
+          { "label": "Overview", "value": "Medium-dark roast offering balance between strength and smoothness." }
+        ]
+      },
+      {
+        "title": "Why You’ll Love It",
+        "points": [
+          { "label": "Single Origin", "value": "Authentic farm-level character." },
+          { "label": "Versatile Brew", "value": "Ideal for espresso, French press, and Moka pot." },
+          { "label": "Balanced Boldness", "value": "Medium bitterness without harshness." }
+        ]
+      },
+      {
+        "title": "How to Brew",
+        "points": [
+          { "label": "Espresso", "value": "1:2 ratio, 25–30 seconds." },
+          { "label": "French Press", "value": "1:15–1:16 ratio, 4 minutes steep." },
+          { "label": "Moka Pot", "value": "Medium-fine grind, low heat." }
+        ]
+      },
+      {
+        "title": "Taste Profile",
+        "points": [
+          { "label": "Body", "value": "Full, rounded" },
+          { "label": "Acidity", "value": "Medium-low" },
+          { "label": "Notes", "value": "Cocoa, toasted nuts, caramel" },
+          { "label": "Aroma", "value": "Warm and inviting" }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Premium Arabica Single Origin Coffee Beans – 1 KG",
+    "category": "COFFEE_BEANS",
+    "roastLevel": "LIGHT_MEDIUM",
+    "origin": "High Altitude Single Origin",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 60,
+    "availableGrams": [1000],
+    "pricePerVariant": { "1000": 1746 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/fa255424-b4f4-478e-8583-d82123d39f86.png",
+    "tastingNotes": [
+      "Elegant cup with chocolate, fruit, floral notes, and lingering sweetness."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Product Details",
+        "points": [
+          { "label": "Overview", "value": "High-altitude Arabica beans with layered complexity." }
+        ]
+      },
+      {
+        "title": "Why You’ll Love It",
+        "points": [
+          { "label": "Distinct Origin", "value": "Clear regional identity." },
+          { "label": "Complex Notes", "value": "Chocolate, fruit, floral undertones." },
+          { "label": "Versatile Brewing", "value": "Pour-over, French press, espresso." }
+        ]
+      },
+      {
+        "title": "Taste Profile",
+        "points": [
+          { "label": "Body", "value": "Medium, silky" },
+          { "label": "Acidity", "value": "Bright, balanced" },
+          { "label": "Finish", "value": "Clean and sweet" }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Premium Filter Coffee – Medium Roast | 100% Arabica",
+    "category": "FILTER_COFFEE",
+    "roastLevel": "MEDIUM",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 150,
+    "availableGrams": [250],
+    "pricePerVariant": { "250": 175 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/93fdd7b8-556d-4a76-8719-73151d388058.png",
+    "tastingNotes": [
+      "Smooth, nutty filter coffee with gentle sweetness."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Product Details",
+        "points": [
+          { "label": "Blend", "value": "70% Coffee, 30% Chicory" }
+        ]
+      },
+      {
+        "title": "Why You’ll Love It",
+        "points": [
+          { "label": "Balanced Roast", "value": "Medium roast with smooth body." },
+          { "label": "Authentic Taste", "value": "Classic South Indian filter profile." }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Premium Filter Coffee – Strong Roast | Arabica Blend",
+    "category": "FILTER_COFFEE",
+    "roastLevel": "MEDIUM_DARK",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 140,
+    "availableGrams": [250],
+    "pricePerVariant": { "250": 195 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/d8b66d34-f2e7-4172-b20d-1178cf3be0d4.png",
+    "tastingNotes": [
+      "Strong, smoky, full-bodied cup with rich chicory mouthfeel."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Product Details",
+        "points": [
+          { "label": "Blend", "value": "80% Coffee, 20% Chicory" }
+        ]
+      },
+      {
+        "title": "Taste Profile",
+        "points": [
+          { "label": "Notes", "value": "Smoky, robust" },
+          { "label": "Finish", "value": "Smooth and creamy" }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Instant Coffee Pure | 100% Premium Coffee",
+    "category": "INSTANT_COFFEE",
+    "roastLevel": "MEDIUM",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 80,
+    "availableGrams": [100],
+    "pricePerVariant": { "100": 295 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/b01ab228-137d-4e94-b5d6-5043d7c06363.png",
+    "tastingNotes": [
+      "Smooth, aromatic instant coffee with rich body."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Why You’ll Love It",
+        "points": [
+          { "label": "100% Pure Coffee", "value": "No additives or fillers." },
+          { "label": "Instant Convenience", "value": "Ready in seconds." }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Instant Coffee – South Blend",
+    "category": "INSTANT_COFFEE",
+    "roastLevel": "MEDIUM",
+    "origin": "Coorg & Chikmagalur",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 90,
+    "availableGrams": [100],
+    "pricePerVariant": { "100": 330 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/bfe99f83-ade5-4b12-a796-afa1508e558d.png",
+    "tastingNotes": [
+      "Bold instant coffee with smooth finish and estate-grade aroma."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Key Details",
+        "points": [
+          { "label": "Ingredients", "value": "70% Coffee, 30% Chicory" },
+          { "label": "Origin", "value": "Coorg & Chikmagalur" }
+        ]
+      }
+    ]
+  },
+
+  {
+    "name": "Premium Grade Black Tea Leaves – Western Ghats",
+    "category": "TEA",
+    "roastLevel": "NA",
+    "origin": "Western Ghats, India",
+    "currency": "INR",
+    "isActive": true,
+    "stockQuantity": 200,
+    "availableGrams": [250, 500, 1000],
+    "pricePerVariant": { "250": 155, "500": 285, "1000": 545 },
+    "imageUrl": "https://dukaan.b-cdn.net/700x700/webp/media/692ada07-8628-4bdc-90c8-51aca7d71f50.png",
+    "tastingNotes": [
+      "Rich, malty black tea with gentle sweetness and clean finish."
+    ],
+    "descriptionSections": [
+      {
+        "title": "Taste Profile",
+        "points": [
+          { "label": "Body", "value": "Medium–full" },
+          { "label": "Aroma", "value": "Bright and floral" },
+          { "label": "Liquor", "value": "Deep amber" }
+        ]
+      }
+    ]
+  }
+]

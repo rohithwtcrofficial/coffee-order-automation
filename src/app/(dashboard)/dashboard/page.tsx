@@ -1,66 +1,118 @@
-import { adminDb } from '@/lib/firebase/admin';
+// src/app/(dashboard)/dashboard/page.tsx
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/contexts/AuthContext';
 import DashboardClient from '@/components/dashboard/DashboardClient';
 import type { Order, Customer, Product } from '@/lib/types';
+import { collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { db } from '@/lib/firebase/client';
 
-function serializeFirestoreData<T>(data: any): T {
-  return JSON.parse(JSON.stringify(data, (key, value) => {
-    if (value && typeof value === 'object' && value._seconds !== undefined) {
-      return new Date(value._seconds * 1000).toISOString();
+export default function DashboardPage() {
+  const { user, admin, loading: authLoading } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      if (!user || !admin) {
+        console.log('DashboardPage: No user/admin, skipping fetch');
+        return;
+      }
+
+      try {
+        console.log('DashboardPage: Fetching dashboard data');
+        setLoading(true);
+
+        const [ordersSnapshot, customersSnapshot, productsSnapshot] = await Promise.all([
+          getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc'))),
+          getDocs(collection(db, 'customers')),
+          getDocs(collection(db, 'products')),
+        ]);
+
+        const ordersData: Order[] = ordersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Order[];
+
+        const customersData: Customer[] = customersSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Customer[];
+
+        const productsData: Product[] = productsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Product[];
+
+        setOrders(ordersData);
+        setCustomers(customersData);
+        setProducts(productsData);
+        console.log('DashboardPage: Data fetched successfully');
+      } catch (err) {
+        console.error('DashboardPage: Error fetching data:', err);
+        setError('Failed to load dashboard data');
+      } finally {
+        setLoading(false);
+      }
     }
-    return value;
-  }));
-}
 
-async function getDashboardData() {
-  try {
-    const [ordersSnapshot, customersSnapshot, productsSnapshot] = await Promise.all([
-      adminDb.collection('orders').orderBy('createdAt', 'desc').get(),
-      adminDb.collection('customers').get(),
-      adminDb.collection('products').get(),
-    ]);
+    fetchData();
+  }, [user, admin]);
 
-    const orders: Order[] = ordersSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return serializeFirestoreData({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date(),
-      });
-    });
-
-    const customers: Customer[] = customersSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return serializeFirestoreData({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-      });
-    });
-
-    const products: Product[] = productsSnapshot.docs.map(doc => {
-      const data = doc.data();
-      return serializeFirestoreData({
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.() || new Date(),
-        updatedAt: data.updatedAt?.toDate?.() || new Date(),
-      });
-    });
-
-    return { orders, customers, products };
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    return {
-      orders: [] as Order[],
-      customers: [] as Customer[],
-      products: [] as Product[],
-    };
+  if (authLoading) {
+    return (
+      <div className="p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
   }
-}
 
-export default async function DashboardPage() {
-  const { orders, customers, products } = await getDashboardData();
+  if (!user || !admin) {
+    return (
+      <div className="p-8">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <p className="text-yellow-800">Please log in to view the dashboard.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 className="text-red-800 font-semibold">Error</h3>
+          <p className="text-red-600">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="p-8">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 bg-gray-200 rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DashboardClient

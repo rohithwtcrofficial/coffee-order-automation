@@ -18,7 +18,7 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage
 import { db, storage } from '@/lib/firebase/client';
 
 const categoryOptions = [
-  { value: 'COFFEE_BEANS', label: 'Coffee Beans' },
+  { value: 'Coffee Beans', label: 'Coffee Beans' },
   { value: 'FILTER_COFFEE', label: 'Filter Coffee' },
   { value: 'INSTANT_COFFEE', label: 'Instant Coffee' },
   { value: 'TEA', label: 'Tea' },
@@ -36,6 +36,18 @@ interface Variant {
   price: number;
 }
 
+interface DescriptionPoint {
+  label: string;
+  value: string;
+}
+
+interface DescriptionSection {
+  id: string;
+  title: string;
+  points: DescriptionPoint[];
+}
+
+
 export default function EditProductPage() {
   const router = useRouter();
   const params = useParams();
@@ -49,7 +61,10 @@ export default function EditProductPage() {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('COFFEE_BEANS');
   const [roastLevel, setRoastLevel] = useState('MEDIUM');
-  const [description, setDescription] = useState('');
+  const [descriptionSections, setDescriptionSections] = useState<DescriptionSection[]>([]);
+  const [sectionTitle, setSectionTitle] = useState('');
+  const [pointLabel, setPointLabel] = useState('');
+  const [pointValue, setPointValue] = useState('');
   const [origin, setOrigin] = useState('');
   const [stockQuantity, setStockQuantity] = useState(0);
   const [isActive, setIsActive] = useState(true);
@@ -73,6 +88,65 @@ export default function EditProductPage() {
   const [tastingNotes, setTastingNotes] = useState<string[]>([]);
   const [newNote, setNewNote] = useState('');
 
+  const addSection = () => {
+  if (!sectionTitle.trim()) return;
+
+  setDescriptionSections(prev => [
+    ...prev,
+    {
+      id: crypto.randomUUID(),
+      title: sectionTitle.trim(),
+      points: [],
+    },
+  ]);
+
+  setSectionTitle('');
+};
+
+const removeSection = (id: string) => {
+  setDescriptionSections(prev => prev.filter(s => s.id !== id));
+};
+
+const addPointToSection = (sectionId: string) => {
+  if (!pointLabel.trim() || !pointValue.trim()) return;
+
+  setDescriptionSections(prev =>
+    prev.map(section =>
+      section.id === sectionId
+        ? {
+            ...section,
+            points: [
+              ...section.points,
+              {
+                label: pointLabel.trim(),
+                value: pointValue.trim(),
+              },
+            ],
+          }
+        : section
+    )
+  );
+
+  setPointLabel('');
+  setPointValue('');
+};
+
+
+const removePoint = (sectionId: string, index: number) => {
+  setDescriptionSections(prev =>
+    prev.map(section =>
+      section.id === sectionId
+        ? {
+            ...section,
+            points: section.points.filter((_, i) => i !== index),
+          }
+        : section
+    )
+  );
+};
+
+
+
   // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
@@ -91,9 +165,32 @@ export default function EditProductPage() {
         console.log('🖼️ Product imageUrl:', data.imageUrl);
         
         setName(data.name || '');
-        setCategory(data.category || 'COFFEE_BEANS');
+        setCategory(data.category || 'Coffee Beans');
         setRoastLevel(data.roastLevel || 'MEDIUM');
-        setDescription(data.description || '');
+        if (Array.isArray(data.descriptionSections)) {
+        if (Array.isArray(data.descriptionSections)) {
+  setDescriptionSections(
+    data.descriptionSections.map((section: any) => ({
+      ...section,
+      points: section.points.map((p: any) =>
+        typeof p === 'string'
+          ? { label: 'Detail', value: p }
+          : p
+      ),
+    }))
+  );
+}
+      } else if (data.description) {
+        // Convert legacy description string into one section
+        setDescriptionSections([
+          {
+            id: 'legacy',
+            title: 'Description',
+            points: [data.description],
+          },
+        ]);
+      }
+
         setOrigin(data.origin || '');
         setStockQuantity(data.stockQuantity || 0);
         setIsActive(data.isActive ?? true);
@@ -342,7 +439,7 @@ export default function EditProductPage() {
         name,
         category,
         roastLevel,
-        description,
+        descriptionSections:descriptionSections.length > 0 ? descriptionSections : null,
         origin: origin || null,
         availableGrams: availableGrams.sort((a, b) => a - b),
         pricePerVariant,
@@ -785,13 +882,97 @@ export default function EditProductPage() {
               <label className="block text-sm font-bold text-gray-900 mb-2">
                 Description
               </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows={4}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all"
-                placeholder="Describe the flavor profile, brewing recommendations, etc."
-              />
+              <div className="mt-6">
+  <label className="block text-sm font-bold text-gray-900 mb-2">
+    Product Description (Structured)
+  </label>
+
+  {/* Add Section */}
+  <div className="flex gap-2 mb-4">
+    <Input
+      value={sectionTitle}
+      onChange={(e) => setSectionTitle(e.target.value)}
+      placeholder="Section title (e.g. Why you’ll love it)"
+      className="border-2"
+    />
+    <Button
+      type="button"
+      onClick={addSection}
+      className="bg-linear-to-r from-amber-600 to-orange-600"
+    >
+      <Plus className="w-4 h-4" />
+    </Button>
+  </div>
+
+  {/* Sections */}
+  <div className="space-y-4">
+    {descriptionSections.map(section => (
+      <div
+        key={section.id}
+        className="p-4 bg-linear-to-br from-gray-50 to-amber-50 rounded-xl border-2 border-gray-200"
+      >
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="font-bold text-gray-900">{section.title}</h4>
+          <button
+            type="button"
+            aria-label="WHAT IT DOES"
+            onClick={() => removeSection(section.id)}
+            className="text-red-600"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Add Point */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+  <Input
+    value={pointLabel}
+    onChange={(e) => setPointLabel(e.target.value)}
+    placeholder="Label (e.g. Bean, Roast, Body)"
+    className="border-2"
+  />
+  <Input
+    value={pointValue}
+    onChange={(e) => setPointValue(e.target.value)}
+    placeholder="Value (e.g. 100% Arabica, Medium)"
+    className="border-2"
+  />
+</div>
+
+<Button
+  type="button"
+  onClick={() => addPointToSection(section.id)}
+  className="bg-amber-500"
+>
+  <Plus className="w-4 h-4" />
+</Button>
+
+        {/* Points */}
+        <ul className="space-y-1">
+  {section.points.map((point, index) => (
+    <li
+      key={index}
+      className="flex justify-between items-start gap-2"
+    >
+      <div>
+        <span className="font-semibold">{point.label}:</span>{' '}
+        <span>{point.value}</span>
+      </div>
+      <button
+        type="button"
+        onClick={() => removePoint(section.id, index)}
+        className="text-red-500"
+        aria-label="WHAT IT DOES"
+      >
+        <X className="w-3 h-3" />
+      </button>
+    </li>
+  ))}
+</ul>
+      </div>
+    ))}
+  </div>
+</div>
             </div>
           </Card>
 
@@ -888,6 +1069,7 @@ export default function EditProductPage() {
                   >
                     {note}
                     <button
+                    aria-label="WHAT IT DOES"
                       type="button"
                       onClick={() => removeTastingNote(note)}
                       className="ml-2 hover:text-red-600 transition-colors"
