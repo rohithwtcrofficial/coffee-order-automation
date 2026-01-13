@@ -9,53 +9,54 @@ import Link from 'next/link';
 
 interface OrdersTableProps {
   orders: Order[];
+  productImages: Record<string, string>;
 }
 
-export function OrdersTable({ orders }: OrdersTableProps) {
+export function OrdersTable({ orders, productImages }: OrdersTableProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
- const getStatusColor = (status: string): BadgeVariant => {
-  switch (status) {
-    case 'RECEIVED':
-      return 'info';
-    case 'ACCEPTED':
-      return 'success';
-    case 'PACKED':
-      return 'info';
-    case 'SHIPPED':
-      return 'info';
-    case 'DELIVERED':
-      return 'success';
-    case 'CANCELLED':
-      return 'danger';
-    default:
-      return 'default';
-  }
-};
+  const getStatusColor = (status: string): BadgeVariant => {
+    switch (status) {
+      case 'RECEIVED':
+        return 'info';
+      case 'ACCEPTED':
+        return 'success';
+      case 'PACKED':
+        return 'info';
+      case 'SHIPPED':
+        return 'info';
+      case 'DELIVERED':
+        return 'success';
+      case 'CANCELLED':
+        return 'danger';
+      default:
+        return 'default';
+    }
+  };
 
- const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'RECEIVED': return '📥';
-    case 'ACCEPTED': return '✅';
-    case 'PACKED': return '📦';
-    case 'SHIPPED': return '🚚';
-    case 'DELIVERED': return '🎉';
-    case 'CANCELLED': return '❌';
-    default: return '📋';
-  }
-};
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'RECEIVED': return '📥';
+      case 'ACCEPTED': return '✅';
+      case 'PACKED': return '📦';
+      case 'SHIPPED': return '🚚';
+      case 'DELIVERED': return '🎉';
+      case 'CANCELLED': return '❌';
+      default: return '📋';
+    }
+  };
 
   const formatDate = (date: Date | string) => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return new Intl.DateTimeFormat('en-IN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(dateObj);
-};
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    return new Intl.DateTimeFormat('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(dateObj);
+  };
 
   // Filter orders
   const filteredOrders = orders.filter(order => {
@@ -69,14 +70,14 @@ export function OrdersTable({ orders }: OrdersTableProps) {
   });
 
   const statusCounts = {
-  ALL: orders.length,
-  RECEIVED: orders.filter(o => o.status === 'RECEIVED').length,
-  ACCEPTED: orders.filter(o => o.status === 'ACCEPTED').length,
-  PACKED: orders.filter(o => o.status === 'PACKED').length,
-  SHIPPED: orders.filter(o => o.status === 'SHIPPED').length,
-  DELIVERED: orders.filter(o => o.status === 'DELIVERED').length,
-  CANCELLED: orders.filter(o => o.status === 'CANCELLED').length,
-};
+    ALL: orders.length,
+    RECEIVED: orders.filter(o => o.status === 'RECEIVED').length,
+    ACCEPTED: orders.filter(o => o.status === 'ACCEPTED').length,
+    PACKED: orders.filter(o => o.status === 'PACKED').length,
+    SHIPPED: orders.filter(o => o.status === 'SHIPPED').length,
+    DELIVERED: orders.filter(o => o.status === 'DELIVERED').length,
+    CANCELLED: orders.filter(o => o.status === 'CANCELLED').length,
+  };
 
   if (orders.length === 0) {
     return (
@@ -100,48 +101,48 @@ export function OrdersTable({ orders }: OrdersTableProps) {
 
       {/* Summary Stats */}
       {filteredOrders.length > 0 && (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
-    <div className="bg-linear-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
-      <div className="flex items-center gap-2 text-blue-600 mb-1">
-        <Package className="w-4 h-4" />
-        <span className="text-sm font-medium">Total Orders</span>
-      </div>
-      <div className="text-2xl font-bold text-blue-900">{filteredOrders.length}</div>
-    </div>
-    
-    <div className="bg-linear-to-br from-green-50 to-green-100 p-4 rounded-lg">
-      <div className="flex items-center gap-2 text-green-600 mb-1">
-        <IndianRupee className="w-4 h-4" />
-        <span className="text-sm font-medium">Total Revenue</span>
-      </div>
-      <div className="text-2xl font-bold text-green-900">
-        ₹{filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0).toFixed(2)}
-      </div>
-    </div>
-    
-    <div className="bg-linear-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
-      <div className="flex items-center gap-2 text-purple-600 mb-1">
-        <Package className="w-4 h-4" />
-        <span className="text-sm font-medium">Total Items</span>
-      </div>
-      <div className="text-2xl font-bold text-purple-900">
-        {filteredOrders.reduce((sum, o) => 
-          sum + o.items.reduce((s, i) => s + i.quantity, 0), 0
-        )}
-      </div>
-    </div>
-    
-    <div className="bg-linear-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
-      <div className="flex items-center gap-2 text-orange-600 mb-1">
-        <IndianRupee className="w-4 h-4" />
-        <span className="text-sm font-medium">Avg Order Value</span>
-      </div>
-      <div className="text-2xl font-bold text-orange-900">
-        ₹{(filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0) / filteredOrders.length).toFixed(2)}
-      </div>
-    </div>
-  </div>
-)}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200">
+          <div className="bg-linear-to-br from-blue-50 to-blue-100 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-blue-600 mb-1">
+              <Package className="w-4 h-4" />
+              <span className="text-sm font-medium">Total Orders</span>
+            </div>
+            <div className="text-2xl font-bold text-blue-900">{filteredOrders.length}</div>
+          </div>
+          
+          <div className="bg-linear-to-br from-green-50 to-green-100 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-green-600 mb-1">
+              <IndianRupee className="w-4 h-4" />
+              <span className="text-sm font-medium">Total Revenue</span>
+            </div>
+            <div className="text-2xl font-bold text-green-900">
+              ₹{filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0).toFixed(2)}
+            </div>
+          </div>
+          
+          <div className="bg-linear-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-purple-600 mb-1">
+              <Package className="w-4 h-4" />
+              <span className="text-sm font-medium">Total Items</span>
+            </div>
+            <div className="text-2xl font-bold text-purple-900">
+              {filteredOrders.reduce((sum, o) => 
+                sum + o.items.reduce((s, i) => s + i.quantity, 0), 0
+              )}
+            </div>
+          </div>
+          
+          <div className="bg-linear-to-br from-orange-50 to-orange-100 p-4 rounded-lg">
+            <div className="flex items-center gap-2 text-orange-600 mb-1">
+              <IndianRupee className="w-4 h-4" />
+              <span className="text-sm font-medium">Avg Order Value</span>
+            </div>
+            <div className="text-2xl font-bold text-orange-900">
+              ₹{(filteredOrders.reduce((sum, o) => sum + o.totalAmount, 0) / filteredOrders.length).toFixed(2)}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters and Search */}
       <div className="space-y-4">
@@ -158,7 +159,7 @@ export function OrdersTable({ orders }: OrdersTableProps) {
         </div>
 
         {/* Status Filter Tabs */}
-                          <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
           <Filter className="w-4 h-4 text-gray-400 shrink-0" />
           {Object.entries(statusCounts).map(([status, count]) => (
             <button
@@ -227,31 +228,36 @@ export function OrdersTable({ orders }: OrdersTableProps) {
               {/* Order Items Preview */}
               <div className="border-t border-gray-100 pt-3">
                 <div className="flex flex-wrap gap-2">
-                  {order.items.slice(0, 3).map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg text-sm"
-                    >
-                      {item.imageUrl ? (
-                        <div className="w-6 h-6 rounded overflow-hidden shrink-0">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={item.imageUrl}
-                            alt={item.productName}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <Package className="w-4 h-4 text-gray-400" />
-                      )}
-                      <span className="font-medium text-gray-900">
-                        {item.productName}
-                      </span>
-                      <span className="text-gray-600">
-                        {item.grams}g × {item.quantity}
-                      </span>
-                    </div>
-                  ))}
+                  {order.items.slice(0, 3).map((item, idx) => {
+                    // Get current image from productImages using productId
+                    const imageUrl = item.productId ? productImages[item.productId] : null;
+                    
+                    return (
+                      <div
+                        key={idx}
+                        className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg text-sm"
+                      >
+                        {imageUrl ? (
+                          <div className="w-6 h-6 rounded overflow-hidden shrink-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={imageUrl}
+                              alt={item.productName}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <Package className="w-4 h-4 text-gray-400" />
+                        )}
+                        <span className="font-medium text-gray-900">
+                          {item.productName}
+                        </span>
+                        <span className="text-gray-600">
+                          {item.grams}g × {item.quantity}
+                        </span>
+                      </div>
+                    );
+                  })}
                   {order.items.length > 3 && (
                     <div className="inline-flex items-center px-3 py-1.5 bg-primary-50 rounded-lg text-sm font-medium text-primary-700">
                       +{order.items.length - 3} more

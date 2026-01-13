@@ -14,9 +14,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import {doc,setDoc, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase/client';
+
 
 const categoryOptions = [
   { value: 'COFFEE_BEANS', label: 'Coffee Beans' },
@@ -37,17 +38,19 @@ interface DescriptionPoint {
   value: string;
 }
 
+interface Variant {
+  grams: number;
+  price: number;
+  productLink: string; // ✅ NEW
+}
+
+
 interface DescriptionSection {
   id: string;
   title: string;
   points: DescriptionPoint[];
 }
 
-
-interface Variant {
-  grams: number;
-  price: number;
-}
 
 export default function NewProductPage() {
   const router = useRouter();
@@ -76,8 +79,9 @@ export default function NewProductPage() {
 
   // Variants (grams and prices)
   const [variants, setVariants] = useState<Variant[]>([
-    { grams: 250, price: 0 },
-  ]);
+  { grams: 250, price: 0, productLink: '' },
+]);
+
 
   // Tasting Notes
   const [tastingNotes, setTastingNotes] = useState<string[]>([]);
@@ -188,8 +192,12 @@ const removePoint = (sectionId: string, index: number) => {
   };
 
   const addVariant = () => {
-    setVariants([...variants, { grams: 500, price: 0 }]);
-  };
+  setVariants([
+    ...variants,
+    { grams: 500, price: 0, productLink: '' },
+  ]);
+};
+
 
   const removeVariant = (index: number) => {
     if (variants.length > 1) {
@@ -197,11 +205,17 @@ const removePoint = (sectionId: string, index: number) => {
     }
   };
 
-  const updateVariant = (index: number, field: 'grams' | 'price', value: number) => {
-    const newVariants = [...variants];
-    newVariants[index][field] = value;
-    setVariants(newVariants);
-  };
+  const updateVariant = (
+  index: number,
+  field: 'grams' | 'price' | 'productLink',
+  value: number | string
+) => {
+  const newVariants = [...variants];
+  // @ts-ignore
+  newVariants[index][field] = value;
+  setVariants(newVariants);
+};
+
 
   const addTastingNote = () => {
     if (newNote.trim() && !tastingNotes.includes(newNote.trim())) {
@@ -243,32 +257,56 @@ const removePoint = (sectionId: string, index: number) => {
         imageUrl = imageUrlInput;
       }
 
-      // Build price per variant object
-      const pricePerVariant: Record<number, number> = {};
-      const availableGrams: number[] = [];
 
-      variants.forEach(v => {
-        pricePerVariant[v.grams] = v.price;
-        availableGrams.push(v.grams);
-      });
 
-      // Create product
-      await addDoc(collection(db, 'products'), {
-        name,
-        category,
-        roastLevel,
-        descriptionSections:descriptionSections.length > 0 ? descriptionSections : null,
-        origin: origin || null,
-        availableGrams: availableGrams.sort((a, b) => a - b),
-        pricePerVariant,
-        stockQuantity,
-        isActive,
-        tastingNotes: tastingNotes.length > 0 ? tastingNotes : null,
-        imageUrl: imageUrl || null,
-        currency: 'INR',
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+
+
+
+      // Validate product links
+if (variants.some(v => !v.productLink.trim())) {
+  throw new Error('Each size must have a product link');
+}
+
+// Build price map
+const pricePerVariant: Record<number, number> = {};
+const availableGrams: number[] = [];
+
+variants.forEach(v => {
+  pricePerVariant[v.grams] = v.price;
+  availableGrams.push(v.grams);
+});
+
+// ✅ CREATE PRODUCT DOC
+const productRef = doc(collection(db, 'products'));
+
+await setDoc(productRef, {
+  name,
+  category,
+  roastLevel,
+  descriptionSections: descriptionSections.length ? descriptionSections : null,
+  origin: origin || null,
+  availableGrams: availableGrams.sort((a, b) => a - b),
+  pricePerVariant,
+  stockQuantity,
+  isActive,
+  tastingNotes: tastingNotes.length ? tastingNotes : null,
+  imageUrl: imageUrl || null,
+  currency: 'INR',
+  createdAt: serverTimestamp(),
+  updatedAt: serverTimestamp(),
+});
+
+// ✅ SAVE VARIANTS SUB-COLLECTION
+const variantsRef = collection(productRef, 'variants');
+
+for (const variant of variants) {
+  await setDoc(doc(variantsRef, String(variant.grams)), {
+    grams: variant.grams,
+    price: variant.price,
+    productLink: variant.productLink,
+    createdAt: serverTimestamp(),
+  });
+}
 
       toast.success('Product created successfully!');
       router.push('/products');
@@ -277,6 +315,11 @@ const removePoint = (sectionId: string, index: number) => {
     } finally {
       setLoading(false);
     }
+
+
+
+
+
   };
 
   const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -717,6 +760,16 @@ const removePoint = (sectionId: string, index: number) => {
                     min="0"
                     value={variant.price}
                     onChange={(e) => updateVariant(index, 'price', parseFloat(e.target.value) || 0)}
+                    required
+                    className="border-2"
+                  />
+                  <Input
+                    label="Product Link"
+                    value={variant.productLink}
+                    onChange={(e) =>
+                      updateVariant(index, 'productLink', e.target.value)
+                    }
+                    placeholder="https://example.com/product-250g"
                     required
                     className="border-2"
                   />

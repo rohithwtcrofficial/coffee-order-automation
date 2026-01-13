@@ -76,9 +76,41 @@ async function getOrderStats(orders: Order[]) {
   };
   return stats;
 }
+async function getProductImages(orders: Order[]): Promise<Record<string, string>> {
+  const uniqueProductIds = new Set<string>();
+  
+  // Collect all unique product IDs from all orders
+  orders.forEach(order => {
+    order.items?.forEach(item => {
+      if (item.productId) {
+        uniqueProductIds.add(item.productId);
+      }
+    });
+  });
+
+  const productImages: Record<string, string> = {};
+
+  // Fetch images for each product
+  for (const productId of uniqueProductIds) {
+    try {
+      const productDoc = await adminDb.collection('products').doc(productId).get();
+      if (productDoc.exists) {
+        const productData = productDoc.data();
+        if (productData?.imageUrl) {
+          productImages[productId] = productData.imageUrl;
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching product ${productId}:`, error);
+    }
+  }
+
+  return productImages;
+}
 
 export default async function OrdersPage() {
   const orders = await getOrders();
+  const productImages = await getProductImages(orders);
   const stats = await getOrderStats(orders);
 
   return (
@@ -164,7 +196,7 @@ export default async function OrdersPage() {
       {/* Main Content */}
       <div className="max-w-400 mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <Card className="border-none shadow-xl overflow-hidden">
-          <OrdersTable orders={orders} />
+         <OrdersTable orders={orders} productImages={productImages} />
         </Card>
       </div>
     </div>

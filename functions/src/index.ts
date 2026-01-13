@@ -5,12 +5,12 @@ import { logger } from './utils/logger';
 import { sendEmail } from './email/sender';
 import { logEmailToFirestore } from './utils/emailLogger';
 
-import { generateOrderReceivedEmail } from './email/templates/received';
-import { generateOrderAcceptedEmail } from './email/templates/accepted';
-import { generateOrderPackedEmail } from './email/templates/packed';
-import { generateShippedEmail } from './email/templates/shipped';
-import { generateDeliveredEmail } from './email/templates/delivered';
-import { generateCancelledEmail } from './email/templates/cancelled';
+import { generateOrderReceivedEmail } from './email/templates/orderReceivedEmail';
+import { generateOrderAcceptedEmail } from './email/templates/orderAcceptedEmail';
+import { generateOrderPackedEmail } from './email/templates/orderPackedEmail';
+import { generateShippedEmail } from './email/templates/orderShippedEmail';
+import { generateDeliveredEmail } from './email/templates/orderDeliveredEmail';
+import { generateCancelledEmail } from './email/templates/orderCancelledEmail';
 
 /**
  * 🔐 Global options
@@ -82,14 +82,15 @@ export const onOrderCreated = onDocumentCreated(
           ? featuredSnap.data()?.products || []
           : [];
 
-      const template = generateOrderReceivedEmail({
-        customerName: customer.name,
-        orderNumber: order.orderNumber,
-        items: order.items,
-        totalAmount: order.totalAmount,
-        address: order.deliveryAddress,
-        featuredProducts,
-      });
+      // ✅ FIX: Pass db as second parameter
+      const template = await generateOrderReceivedEmail({
+  customerName: customer.name,
+  orderNumber: order.orderNumber,
+  items: order.items,
+  totalAmount: order.totalAmount,
+  address: order.deliveryAddress,
+  featuredProducts,
+}, db);  // ← Added db parameter here!
 
       await sendEmail(customer.email, template.subject, template.html);
 
