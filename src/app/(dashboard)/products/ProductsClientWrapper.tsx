@@ -22,6 +22,22 @@ interface DeleteModalProps {
   loading: boolean;
 }
 
+const CATEGORY_LABEL_MAP: Record<string, string> = {
+  COFFEE_BEANS: 'Coffee Beans',
+  FILTER_COFFEE: 'Filter Coffee',
+  INSTANT_COFFEE: 'Instant Coffee',
+  TEA: 'Tea',
+};
+
+const ROAST_LABEL_MAP: Record<string, string> = {
+  LIGHT: 'Light',
+  MEDIUM: 'Medium',
+  MEDIUM_DARK: 'Medium Dark',
+  LIGHT_MEDIUM:'Light Medium',
+  DARK: 'Dark',
+};
+
+
 function DeleteModal({ isOpen, onClose, onConfirm, productName, loading }: DeleteModalProps) {
   if (!isOpen) return null;
 
@@ -134,7 +150,9 @@ function ActionsModal({ isOpen, onClose, product, onDelete }: ActionsModalProps)
               )}
               <div className="flex-1">
                 <h3 className="font-bold text-gray-900 text-lg mb-1">{product.name}</h3>
-                <p className="text-sm text-gray-500">{product.category}</p>
+                <p className="text-sm text-gray-500 font-medium">
+                  {CATEGORY_LABEL_MAP[product.category] ?? product.category}
+                </p>
               </div>
             </div>
 
@@ -307,14 +325,18 @@ export default function ProductsClientWrapper({ products: initialProducts }: Pro
                 <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">
                   {product.name}
                 </h3>
-                <p className="text-sm text-gray-500 font-medium">{product.category}</p>
+                <p className="text-sm font-bold text-amber-900">
+                 {ROAST_LABEL_MAP[product.roastLevel] ?? product.roastLevel}
+                </p>
               </div>
 
               {/* Product Details Grid */}
               <div className="grid grid-cols-2 gap-2 py-2">
                 <div className="bg-amber-50 rounded-lg p-2">
                   <p className="text-xs text-amber-700 font-medium mb-0.5">Roast</p>
-                  <p className="text-sm font-bold text-amber-900">{product.roastLevel}</p>
+                  <p className="text-sm font-bold text-amber-900">
+                  {ROAST_LABEL_MAP[product.roastLevel] ?? product.roastLevel}
+                </p>
                 </div>
                 <div className="bg-blue-50 rounded-lg p-2">
                   <p className="text-xs text-blue-700 font-medium mb-0.5">Stock</p>

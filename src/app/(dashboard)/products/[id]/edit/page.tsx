@@ -13,12 +13,13 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, serverTimestamp , collection, getDocs , setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase/client';
+import {CATEGORY_OPTIONS,ROAST_LEVEL_OPTIONS} from '@/lib/constants/productOptions';
 
 const categoryOptions = [
-  { value: 'Coffee Beans', label: 'Coffee Beans' },
+  { value: 'COFFEE_BEANS', label: 'Coffee Beans' },
   { value: 'FILTER_COFFEE', label: 'Filter Coffee' },
   { value: 'INSTANT_COFFEE', label: 'Instant Coffee' },
   { value: 'TEA', label: 'Tea' },
@@ -34,7 +35,9 @@ const roastLevelOptions = [
 interface Variant {
   grams: number;
   price: number;
+  productLink: string; // ✅ NEW
 }
+
 
 interface DescriptionPoint {
   label: string;
@@ -81,8 +84,9 @@ export default function EditProductPage() {
 
   // Variants (grams and prices)
   const [variants, setVariants] = useState<Variant[]>([
-    { grams: 250, price: 0 },
-  ]);
+  { grams: 250, price: 0, productLink: '' },
+]);
+
 
   // Tasting Notes
   const [tastingNotes, setTastingNotes] = useState<string[]>([]);
@@ -204,12 +208,24 @@ const removePoint = (sectionId: string, index: number) => {
 
         // Convert pricePerVariant to variants array
         if (data.availableGrams && data.pricePerVariant) {
-          const variantsArray = data.availableGrams.map((grams: number) => ({
-            grams,
-            price: data.pricePerVariant[grams] || 0,
-          }));
-          setVariants(variantsArray);
-        }
+  const variantsRef = collection(db, 'products', productId, 'variants');
+  const variantsSnap = await getDocs(variantsRef);
+
+  const linkMap: Record<number, string> = {};
+  variantsSnap.forEach(doc => {
+    const v = doc.data();
+    linkMap[v.grams] = v.productLink || '';
+  });
+
+  const variantsArray = data.availableGrams.map((grams: number) => ({
+    grams,
+    price: data.pricePerVariant[grams] || 0,
+    productLink: linkMap[grams] || '',
+  }));
+
+  setVariants(variantsArray);
+}
+
       } catch (error) {
         console.error('Error fetching product:', error);
         toast.error('Failed to load product');
@@ -321,8 +337,12 @@ const removePoint = (sectionId: string, index: number) => {
   };
 
   const addVariant = () => {
-    setVariants([...variants, { grams: 500, price: 0 }]);
-  };
+  setVariants([
+    ...variants,
+    { grams: 500, price: 0, productLink: '' },
+  ]);
+};
+
 
   const removeVariant = (index: number) => {
     if (variants.length > 1) {
@@ -330,11 +350,17 @@ const removePoint = (sectionId: string, index: number) => {
     }
   };
 
-  const updateVariant = (index: number, field: 'grams' | 'price', value: number) => {
-    const newVariants = [...variants];
-    newVariants[index][field] = value;
-    setVariants(newVariants);
-  };
+  const updateVariant = (
+  index: number,
+  field: 'grams' | 'price' | 'productLink',
+  value: number | string
+) => {
+  const newVariants = [...variants];
+  // @ts-ignore
+  newVariants[index][field] = value;
+  setVariants(newVariants);
+};
+
 
   const addTastingNote = () => {
     if (newNote.trim() && !tastingNotes.includes(newNote.trim())) {
@@ -450,6 +476,23 @@ const removePoint = (sectionId: string, index: number) => {
         currency: 'INR',
         updatedAt: serverTimestamp(),
       });
+
+      // ✅ UPDATE VARIANTS SUB-COLLECTION
+const variantsRef = collection(db, 'products', productId, 'variants');
+
+for (const variant of variants) {
+  await setDoc(
+    doc(variantsRef, String(variant.grams)),
+    {
+      grams: variant.grams,
+      price: variant.price,
+      productLink: variant.productLink,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
 
       console.log('✅ Product updated successfully');
       toast.success('Product updated successfully!');
@@ -832,7 +875,7 @@ const removePoint = (sectionId: string, index: number) => {
                 label="Category *"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                options={categoryOptions}
+                options={CATEGORY_OPTIONS}
                 required
                 className="border-2"
               />
@@ -841,7 +884,7 @@ const removePoint = (sectionId: string, index: number) => {
                 label="Roast Level *"
                 value={roastLevel}
                 onChange={(e) => setRoastLevel(e.target.value)}
-                options={roastLevelOptions}
+                options={ROAST_LEVEL_OPTIONS}
                 required
                 className="border-2"
               />
@@ -1008,6 +1051,16 @@ const removePoint = (sectionId: string, index: number) => {
                     min="0"
                     value={variant.price}
                     onChange={(e) => updateVariant(index, 'price', parseFloat(e.target.value) || 0)}
+                    required
+                    className="border-2"
+                  />
+                  <Input
+                    label="Product Link"
+                    value={variant.productLink}
+                    onChange={(e) =>
+                      updateVariant(index, 'productLink', e.target.value)
+                    }
+                    placeholder="https://example.com/product-250g"
                     required
                     className="border-2"
                   />

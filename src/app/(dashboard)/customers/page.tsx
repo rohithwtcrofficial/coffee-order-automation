@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Customer, Address } from '@/lib/types/order';
@@ -38,6 +39,7 @@ function getPrimaryAddress(customer: any): Address | null {
 }
 
 export default function CustomersPage() {
+  const router = useRouter();
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -181,6 +183,15 @@ export default function CustomersPage() {
                     <RefreshCw className="w-4 h-4 mr-1" />
                     <span className="hidden sm:inline">Refresh</span>
                   </Button>
+                  <Button
+                    onClick={() => router.push('/customers/new')}
+                    variant="primary"
+                    size="sm"
+                    className="bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  >
+                    <UserPlus className="w-4 h-4 mr-1" />
+                    <span className="hidden sm:inline">Create Customer</span>
+                  </Button>
                 </div>
               </div>
 
@@ -282,9 +293,19 @@ export default function CustomersPage() {
               <h3 className="text-lg font-bold text-gray-900 mb-2">
                 {searchTerm ? 'No customers found' : 'No customers yet'}
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mb-4">
                 {searchTerm ? 'Try adjusting your search terms' : 'Customers will appear here once orders are placed'}
               </p>
+              {!searchTerm && (
+                <Button
+                  onClick={() => router.push('/customers/new')}
+                  variant="primary"
+                  className="bg-linear-to-r from-purple-600 to-pink-600"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Create First Customer
+                </Button>
+              )}
             </div>
           </Card>
         ) : (
