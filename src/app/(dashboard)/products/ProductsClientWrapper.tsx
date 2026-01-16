@@ -326,7 +326,7 @@ export default function ProductsClientWrapper({ products: initialProducts }: Pro
                   {product.name}
                 </h3>
                 <p className="text-sm font-bold text-amber-900">
-                 {ROAST_LABEL_MAP[product.roastLevel] ?? product.roastLevel}
+                 {CATEGORY_LABEL_MAP[product.category] ?? product.category}
                 </p>
               </div>
 

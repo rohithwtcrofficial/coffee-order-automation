@@ -12,6 +12,9 @@ import { generateShippedEmail } from './email/templates/orderShippedEmail';
 import { generateDeliveredEmail } from './email/templates/orderDeliveredEmail';
 import { generateCancelledEmail } from './email/templates/orderCancelledEmail';
 
+// dukaan webhook
+export { dukaanWebhookTest } from "./dukaanWebhookTest";
+
 /**
  * 🔐 Global options
  */

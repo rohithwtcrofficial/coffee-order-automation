@@ -875,7 +875,7 @@ for (const variant of variants) {
                 label="Category *"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                options={CATEGORY_OPTIONS}
+                options={categoryOptions}
                 required
                 className="border-2"
               />
@@ -884,7 +884,7 @@ for (const variant of variants) {
                 label="Roast Level *"
                 value={roastLevel}
                 onChange={(e) => setRoastLevel(e.target.value)}
-                options={ROAST_LEVEL_OPTIONS}
+                options={roastLevelOptions}
                 required
                 className="border-2"
               />
