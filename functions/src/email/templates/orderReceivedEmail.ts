@@ -39,26 +39,43 @@ export async function generateOrderReceivedEmail(
 ): Promise<{ subject: string; html: string }> {
 
   // -------------------------
-  // Fetch current product images and URLs
+  // Fetch current product images and URLs from variants subcollection
   // -------------------------
   const productData: Record<string, { imageUrl: string; productUrl: string }> = {};
   const items = data?.items || [];
   
   for (const item of items) {
-    if (item.productId) {
+    if (item.productId && item.grams) {
       try {
-        console.log(`Fetching product data for productId: ${item.productId}`);
+        console.log(`Fetching product data for productId: ${item.productId}, grams: ${item.grams}`);
+        
+        // Fetch the main product document for imageUrl
         const productDoc = await db.collection('products').doc(item.productId).get();
         
         if (productDoc.exists) {
           const product = productDoc.data();
-          console.log(`Product data for ${item.productId}:`, product);
-          
           const imageUrl = product?.imageUrl || 'https://westernterraincoffee.com/images/placeholder.png';
-          const productUrl = `https://westernterraincoffee.com/products/${item.productId}`;
+          
+          // Fetch the variant document for productLink
+          const variantDoc = await db
+            .collection('products')
+            .doc(item.productId)
+            .collection('variants')
+            .doc(item.grams.toString())
+            .get();
+          
+          let productUrl = 'https://westernterraincoffee.com/categories/';
+          
+          if (variantDoc.exists) {
+            const variant = variantDoc.data();
+            productUrl = variant?.productLink || productUrl;
+            console.log(`✅ Found variant productLink for ${item.productId} (${item.grams}g): ${productUrl}`);
+          } else {
+            console.log(`❌ Variant document doesn't exist for ${item.productId} with ${item.grams}g`);
+          }
           
           productData[item.productId] = { imageUrl, productUrl };
-          console.log(`✅ Found product data for ${item.productId}`);
+          console.log(`✅ Product data stored for ${item.productId}`);
         } else {
           console.log(`❌ Product document doesn't exist for ${item.productId}`);
           productData[item.productId] = {

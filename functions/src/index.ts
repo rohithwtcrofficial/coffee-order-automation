@@ -57,7 +57,7 @@ function normalizeStatus(status?: string): string | null {
 }
 
 /**
- * 🆕 ORDER CREATED → ORDER_RECEIVED
+ * 🆕 ORDER CREATED → ORDER_RECEIVED (WITH featured products)
  */
 export const onOrderCreated = onDocumentCreated(
   'orders/{orderId}',
@@ -75,6 +75,7 @@ export const onOrderCreated = onDocumentCreated(
       const customer = customerSnap.data();
       if (!customer?.email) return;
 
+      // ✅ Fetch featured products for ORDER_RECEIVED email
       const featuredSnap = await db
         .collection('featured_products')
         .doc('homepage')
@@ -85,15 +86,17 @@ export const onOrderCreated = onDocumentCreated(
           ? featuredSnap.data()?.products || []
           : [];
 
-      // ✅ FIX: Pass db as second parameter
-      const template = await generateOrderReceivedEmail({
-  customerName: customer.name,
-  orderNumber: order.orderNumber,
-  items: order.items,
-  totalAmount: order.totalAmount,
-  address: order.deliveryAddress,
-  featuredProducts,
-}, db);  // ← Added db parameter here!
+      const template = await generateOrderReceivedEmail(
+        {
+          customerName: customer.name,
+          orderNumber: order.orderNumber,
+          items: order.items,
+          totalAmount: order.totalAmount,
+          address: order.deliveryAddress,
+          featuredProducts, // ✅ Featured products included
+        },
+        db
+      );
 
       await sendEmail(customer.email, template.subject, template.html);
 
@@ -152,22 +155,65 @@ export const onOrderStatusChange = onDocumentUpdated(
       const productNames = after.items.map((i: any) => i.productName);
       let template;
 
+      // ✅ Fetch featured products for emails that need them
+      const featuredSnap = await db
+        .collection('featured_products')
+        .doc('homepage')
+        .get();
+
+      const featuredProducts =
+        featuredSnap.exists && featuredSnap.data()?.active
+          ? featuredSnap.data()?.products || []
+          : [];
+
       switch (afterStatus) {
         case 'ORDER_ACCEPTED':
-          template = generateOrderAcceptedEmail({ customerName: customer.name, orderNumber: after.orderNumber, productNames });
+          // ✅ Featured products included for ORDER_ACCEPTED
+          template = generateOrderAcceptedEmail({
+            customerName: customer.name,
+            orderNumber: after.orderNumber,
+            productNames,
+            featuredProducts, // ✅ Featured products included
+          });
           break;
+
         case 'ORDER_PACKED':
-          template = generateOrderPackedEmail({ customerName: customer.name, orderNumber: after.orderNumber, productNames });
+          template = generateOrderPackedEmail({
+            customerName: customer.name,
+            orderNumber: after.orderNumber,
+            productNames,
+            featuredProducts, // ✅ Featured products included
+          });
           break;
+
         case 'ORDER_SHIPPED':
-          template = generateShippedEmail({ customerName: customer.name, orderNumber: after.orderNumber, trackingId: after.trackingId || 'Will be updated', productNames });
+          template = generateShippedEmail({
+            customerName: customer.name,
+            orderNumber: after.orderNumber,
+            trackingId: after.trackingId || 'Will be updated',
+            productNames,
+            featuredProducts, // ✅ Featured products included
+          });
           break;
+
         case 'ORDER_DELIVERED':
-          template = generateDeliveredEmail({ customerName: customer.name, orderNumber: after.orderNumber, productNames });
+          template = generateDeliveredEmail({
+            customerName: customer.name,
+            orderNumber: after.orderNumber,
+            productNames,
+            featuredProducts, // ✅ Featured products included
+          });
           break;
+
         case 'ORDER_CANCELLED':
-          template = generateCancelledEmail({ customerName: customer.name, orderNumber: after.orderNumber, totalAmount: after.totalAmount });
+          template = generateCancelledEmail({
+            customerName: customer.name,
+            orderNumber: after.orderNumber,
+            totalAmount: after.totalAmount,
+            featuredProducts, // ✅ Featured products included
+          });
           break;
+
         default:
           return;
       }

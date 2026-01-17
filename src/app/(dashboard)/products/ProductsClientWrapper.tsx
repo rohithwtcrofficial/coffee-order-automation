@@ -13,6 +13,9 @@ import { doc, deleteDoc } from 'firebase/firestore';
 import { ref, deleteObject } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase/client';
 import { Product } from '@/lib/types';
+import { CATEGORY_LABEL_MAP, ROAST_LABEL_MAP } from '@/constants/productOptions';
+
+
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -21,21 +24,6 @@ interface DeleteModalProps {
   productName: string;
   loading: boolean;
 }
-
-const CATEGORY_LABEL_MAP: Record<string, string> = {
-  COFFEE_BEANS: 'Coffee Beans',
-  FILTER_COFFEE: 'Filter Coffee',
-  INSTANT_COFFEE: 'Instant Coffee',
-  TEA: 'Tea',
-};
-
-const ROAST_LABEL_MAP: Record<string, string> = {
-  LIGHT: 'Light',
-  MEDIUM: 'Medium',
-  MEDIUM_DARK: 'Medium Dark',
-  LIGHT_MEDIUM:'Light Medium',
-  DARK: 'Dark',
-};
 
 
 function DeleteModal({ isOpen, onClose, onConfirm, productName, loading }: DeleteModalProps) {

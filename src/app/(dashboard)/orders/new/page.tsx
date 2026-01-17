@@ -13,6 +13,7 @@ import toast from 'react-hot-toast';
 import { collection, addDoc, serverTimestamp, getDocs, query, where, updateDoc, doc, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase/client';
 import { Customer, Address } from '@/lib/types/order';
+import { CATEGORY_LABEL_MAP, ROAST_LABEL_MAP } from '@/constants/productOptions';
 
 interface Product {
   id: string;
@@ -295,7 +296,6 @@ export default function NewOrderPage() {
       grams: firstGram,
       pricePerUnit: product.pricePerVariant[firstGram],
       subtotal: newItems[index].quantity * product.pricePerVariant[firstGram],
-      // imageUrl: product.imageUrl || '',
     };
     
     setItems(newItems);
@@ -923,10 +923,7 @@ export default function NewOrderPage() {
                 {item.productId && (
                   <div className="flex items-center justify-between pt-2 border-t border-gray-200">
                     <div className="text-sm text-gray-600">
-                      {item.category} • {item.roastLevel} Roast
-                      {item.imageUrl && (
-                        <span className="ml-2 text-xs text-green-600">📷 Image available</span>
-                      )}
+                      {CATEGORY_LABEL_MAP[item.category] ?? item.category} • {ROAST_LABEL_MAP[item.roastLevel] ?? item.roastLevel} Roast
                     </div>
                     <div className="text-right">
                       <span className="text-sm text-gray-600">Subtotal: </span>

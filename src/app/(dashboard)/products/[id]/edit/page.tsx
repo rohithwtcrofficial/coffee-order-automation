@@ -16,21 +16,7 @@ import toast from 'react-hot-toast';
 import { doc, getDoc, updateDoc, serverTimestamp , collection, getDocs , setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { db, storage } from '@/lib/firebase/client';
-import {CATEGORY_OPTIONS,ROAST_LEVEL_OPTIONS} from '@/lib/constants/productOptions';
-
-const categoryOptions = [
-  { value: 'COFFEE_BEANS', label: 'Coffee Beans' },
-  { value: 'FILTER_COFFEE', label: 'Filter Coffee' },
-  { value: 'INSTANT_COFFEE', label: 'Instant Coffee' },
-  { value: 'TEA', label: 'Tea' },
-];
-
-const roastLevelOptions = [
-  { value: 'LIGHT', label: 'Light' },
-  { value: 'MEDIUM', label: 'Medium' },
-  { value: 'MEDIUM_DARK', label: 'Medium Dark' },
-  { value: 'DARK', label: 'Dark' },
-];
+import { categoryOptions, roastLevelOptions } from '@/constants/productOptions';
 
 interface Variant {
   grams: number;
@@ -350,16 +336,19 @@ const removePoint = (sectionId: string, index: number) => {
     }
   };
 
-  const updateVariant = (
+ const updateVariant = <K extends keyof Variant>(
   index: number,
-  field: 'grams' | 'price' | 'productLink',
-  value: number | string
+  field: K,
+  value: Variant[K]
 ) => {
   const newVariants = [...variants];
-  // @ts-ignore
-  newVariants[index][field] = value;
+  newVariants[index] = {
+    ...newVariants[index],
+    [field]: value,
+  };
   setVariants(newVariants);
 };
+
 
 
   const addTastingNote = () => {
