@@ -1,14 +1,17 @@
 // src/app/profile/page.tsx
 'use client';
 
+'use client';
+
 import { useState, useEffect } from 'react';
-import { auth, db, storage } from '@/lib/firebase/client';
+import { auth, db, storage, functions } from '@/lib/firebase/client'; // cloud function import
 import { doc, setDoc, getDoc, updateDoc, collection, query, getDocs, where, deleteDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { httpsCallable } from 'firebase/functions'; // cloud function import
 import { User, Camera, Save, X, Plus, Trash2, Shield, Mail, UserCog, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import imageCompression from 'browser-image-compression';
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential , createUserWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential, sendPasswordResetEmail } from 'firebase/auth';
 
 interface AdminData {
   id: string;
@@ -189,6 +192,7 @@ const [newAdminPhoto, setNewAdminPhoto] = useState<File | null>(null);
       console.error('Error processing image:', error);
     }
   };
+   
 
   const handleSaveProfile = async () => {
     if (!currentAdmin) return;
@@ -197,9 +201,7 @@ const [newAdminPhoto, setNewAdminPhoto] = useState<File | null>(null);
     try {
       let photoURL = currentAdmin.photoURL;
 
-      // Upload new photo if changed
       if (photoFile) {
-        // Delete old photo if exists
         if (currentAdmin.photoURL) {
           try {
             const oldRef = ref(storage, currentAdmin.photoURL);
@@ -209,13 +211,11 @@ const [newAdminPhoto, setNewAdminPhoto] = useState<File | null>(null);
           }
         }
 
-        // Upload new photo
         const photoRef = ref(storage, `admins/${currentAdmin.id}/profile.jpg`);
         await uploadBytes(photoRef, photoFile);
         photoURL = await getDownloadURL(photoRef);
       }
 
-      // Update Firestore
       await updateDoc(doc(db, 'admins', currentAdmin.id), {
         name: formData.name,
         phone: formData.phone,
@@ -278,84 +278,99 @@ const [newAdminPhoto, setNewAdminPhoto] = useState<File | null>(null);
 
   setSaving(true);
   try {
-    // Check if admin already exists in Firestore
-    const existingAdminsQuery = query(
-      collection(db, 'admins'),
-      where('email', '==', newAdmin.email)
-    );
-    const existingAdmins = await getDocs(existingAdminsQuery);
-    
-    if (!existingAdmins.empty) {
-      alert('An admin with this email already exists.');
-      setSaving(false);
-      return;
-    }
-   // Generate temporary password
-    const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8) + 'Aa1!';
-    // Create Firebase Auth user
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      newAdmin.email,
-      tempPassword
-    );
-
     let photoURL = '';
+    
+    // Upload photo first if provided
     if (newAdminPhoto) {
       const compressed = await compressImage(newAdminPhoto);
-      const photoRef = ref(storage, `admins/${userCredential.user.uid}/profile.jpg`);
-      await uploadBytes(photoRef, compressed);
-      photoURL = await getDownloadURL(photoRef);
+      const tempPhotoRef = ref(storage, `temp-admins/${Date.now()}/profile.jpg`);
+      await uploadBytes(tempPhotoRef, compressed);
+      photoURL = await getDownloadURL(tempPhotoRef);
     }
 
-    // Create admin document with the Auth UID
-    const adminData = {
-      uid: userCredential.user.uid,
+    // Call the Cloud Function to create admin
+    const createAdminFunction = httpsCallable(functions, 'createAdmin');
+    const result = await createAdminFunction({
       name: newAdmin.name,
       email: newAdmin.email,
+      password: newAdmin.password,
       role: newAdmin.role,
       phone: newAdmin.phone || '',
       department: newAdmin.department || '',
-      photoURL: photoURL || '',
-      createdAt: Timestamp.now(),
-      createdBy: currentAdmin.id,
-      isActive: true
+      photoURL: photoURL
+    });
+
+    const data = result.data as {
+      success: boolean;
+      uid: string;
+      message: string;
+      credentials: { email: string; password: string };
     };
 
-   await setDoc(doc(db, 'admins', userCredential.user.uid), adminData);
+    if (data.success) {
+      // If photo was uploaded to temp location, move it to permanent location
+      if (photoURL) {
+        try {
+          const tempPhotoRef = ref(storage, photoURL);
+          const permanentPhotoRef = ref(storage, `admins/${data.uid}/profile.jpg`);
+          
+          // Download from temp and upload to permanent location
+          const photoBlob = await fetch(photoURL).then(r => r.blob());
+          await uploadBytes(permanentPhotoRef, photoBlob);
+          const permanentURL = await getDownloadURL(permanentPhotoRef);
+          
+          // Update admin document with permanent URL
+          await updateDoc(doc(db, 'admins', data.uid), {
+            photoURL: permanentURL
+          });
+          
+          // Delete temp photo
+          await deleteObject(tempPhotoRef);
+        } catch (error) {
+          console.error('Error moving photo:', error);
+          // Photo error is not critical, continue
+        }
+      }
 
-   try {
-      await sendPasswordResetEmail(auth, newAdmin.email);
-      alert(`✅ Admin created successfully!\n\nA password setup email has been sent to ${newAdmin.email}`);
-    } catch (emailError) {
-      console.error('Error sending email:', emailError);
-      alert(`⚠️ Admin created, but email failed to send.\n\nPlease use "Reset Password" button.`);
+      setShowAddAdmin(false);
+      setNewAdmin({
+        name: '',
+        email: '',
+        password: '',
+        role: 'staff',
+        phone: '',
+        department: ''
+      });
+      setNewAdminPhoto(null);
+      
+      await fetchAdminData();
+      alert(`✅ Admin created successfully!\n\nEmail: ${data.credentials.email}\nPassword: ${data.credentials.password}\n\nPlease share these credentials with the new admin.`);
     }
-    
-    setShowAddAdmin(false);
-    setNewAdmin({
-      name: '',
-      email: '',
-      password: '',
-      role: 'staff',
-      phone: '',
-      department: ''
-    });
-    setNewAdminPhoto(null);
-    
-    await fetchAdminData();
-    alert(`Admin created successfully! Login credentials have been set.`);
   } catch (error: any) {
     console.error('Error adding admin:', error);
     
-    switch (error.code) {
-      case 'auth/email-already-in-use':
-        alert('This email is already registered in the authentication system.');
+    // Parse Firebase Functions error
+    const errorCode = error.code || '';
+    const errorMessage = error.message || 'Unknown error occurred';
+    
+    switch (errorCode) {
+      case 'functions/unauthenticated':
+        alert('⚠️ Authentication required.\n\nPlease log in again and try.');
         break;
-      case 'auth/weak-password':
-        alert('Password is too weak. Please use a stronger password.');
+      case 'functions/permission-denied':
+        alert('⚠️ Permission denied.\n\nYou do not have sufficient privileges to create admins.');
+        break;
+      case 'functions/already-exists':
+        alert('⚠️ An admin with this email already exists.\n\nPlease use a different email.');
+        break;
+      case 'functions/invalid-argument':
+        alert(`⚠️ Invalid input.\n\n${errorMessage}`);
+        break;
+      case 'functions/internal':
+        alert(`⚠️ Server error.\n\n${errorMessage}\n\nPlease try again or contact support.`);
         break;
       default:
-        alert(`Error: ${error.message}`);
+        alert(`⚠️ Failed to create admin.\n\nError: ${errorMessage}\n\nPlease try again.`);
     }
   } finally {
     setSaving(false);
@@ -728,19 +743,7 @@ const handleChangePassword = async () => {
                   />
                   <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
                 </div>
-                 <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Password *
-                      </label>
-                      <input
-                        type="password"
-                        value={newAdmin.password}
-                        onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                        placeholder="Enter password (min 6 characters)"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">Password must be at least 6 characters</p>
-                  </div>
+                 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Phone Number
