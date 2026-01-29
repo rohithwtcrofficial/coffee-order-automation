@@ -593,8 +593,8 @@ for (const variant of variants) {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-32">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 pb-32">
+  <form onSubmit={handleSubmit} className="space-y-6">
           {/* Product Image */}
           <Card className="border-none shadow-lg">
             <div className="flex items-center gap-2 mb-4">
@@ -1074,96 +1074,97 @@ for (const variant of variants) {
           </Card>
 
           {/* Tasting Notes */}
-          <Card className="border-none shadow-lg">
-            <div className="flex items-center gap-2 mb-4">
-              <Tag className="w-5 h-5 text-amber-600" />
-              <h2 className="text-lg font-bold text-gray-900">Tasting Notes</h2>
-            </div>
-            
-            <div className="flex gap-2 mb-4">
-              <Input
-                value={newNote}
-                onChange={(e) => setNewNote(e.target.value)}
-                placeholder="e.g., Chocolate, Citrus, Floral"
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addTastingNote();
-                  }
-                }}
-                className="border-2"
-              />
-              <Button 
-                type="button" 
-                onClick={addTastingNote}
-                className="bg-linear-to-r from-amber-600 to-orange-600 shadow-lg"
-              >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
+<Card className="border-none shadow-lg mb-24">
+  <div className="flex items-center gap-2 mb-4">
+    <Tag className="w-5 h-5 text-amber-600" />
+    <h2 className="text-lg font-bold text-gray-900">Tasting Notes</h2>
+  </div>
+  
+  <div className="flex gap-2 mb-4">
+    <Input
+      value={newNote}
+      onChange={(e) => setNewNote(e.target.value)}
+      placeholder="e.g., Chocolate, Citrus, Floral"
+      onKeyPress={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addTastingNote();
+        }
+      }}
+      className="border-2"
+    />
+    <Button 
+      type="button" 
+      onClick={addTastingNote}
+      className="bg-linear-to-r from-amber-600 to-orange-600 shadow-lg"
+    >
+      <Plus className="w-4 h-4" />
+    </Button>
+  </div>
 
-            {tastingNotes.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {tastingNotes.map((note) => (
-                  <span
-                    key={note}
-                    className="inline-flex items-center px-4 py-2 bg-linear-to-r from-amber-100 to-orange-100 text-amber-900 rounded-xl text-sm font-bold border-2 border-amber-200"
-                  >
-                    {note}
-                    <button
-                    aria-label="WHAT IT DOES"
-                      type="button"
-                      onClick={() => removeTastingNote(note)}
-                      className="ml-2 hover:text-red-600 transition-colors"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
-          </Card>
+  {tastingNotes.length > 0 && (
+    <div className="flex flex-wrap gap-2">
+      {tastingNotes.map((note) => (
+        <span
+          key={note}
+          className="inline-flex items-center px-4 py-2 bg-linear-to-r from-amber-100 to-orange-100 text-amber-900 rounded-xl text-sm font-bold border-2 border-amber-200"
+        >
+          {note}
+          <button
+            aria-label="Remove tasting note"
+            type="button"
+            onClick={() => removeTastingNote(note)}
+            className="ml-2 hover:text-red-600 transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </span>
+      ))}
+    </div>
+  )}
+</Card>
         </form>
       </div>
 
       {/* Fixed Bottom Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-40">
-        <div className="max-w-300 mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => router.push('/products')}
-              disabled={loading || uploadingImage}
-              className="w-48 px-6 py-3 border-2 border-gray-300 rounded-xl font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-            >
-              Cancel
-            </button>
+<div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-50">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div className="flex justify-center gap-4">
+      <button
+        type="button"
+        onClick={() => router.push('/products')}
+        disabled={loading || uploadingImage}
+        className="w-40 sm:w-48 px-4 sm:px-6 py-3 border-2 border-gray-300 rounded-xl font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+      >
+        Cancel
+      </button>
 
-            <button
-              onClick={handleSubmit}
-              disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
-              className="w-48 px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center gap-2"
-            >
-              {uploadingImage ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Uploading...
-                </>
-              ) : loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <Save className="w-5 h-5" />
-                  Update Product
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
+      <button
+        onClick={handleSubmit}
+        disabled={loading || uploadingImage || !name || variants.some(v => v.price <= 0)}
+        className="w-40 sm:w-48 px-4 sm:px-6 py-3 bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center gap-2"
+      >
+        {uploadingImage ? (
+          <>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <span className="hidden sm:inline">Uploading...</span>
+          </>
+        ) : loading ? (
+          <>
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+            <span className="hidden sm:inline">Updating...</span>
+          </>
+        ) : (
+          <>
+            <Save className="w-5 h-5" />
+            <span className="hidden sm:inline">Update Product</span>
+            <span className="sm:hidden">Update</span>
+          </>
+        )}
+      </button>
+    </div>
+  </div>
+</div>
     </div>
   );
 }
